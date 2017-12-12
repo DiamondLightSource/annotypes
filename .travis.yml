@@ -1,0 +1,27 @@
+sudo: false
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+
+# For Python < 3.5, typing is an optional dependency
+matrix:
+  include:
+    - python: '2.7'
+      before_install: pip install typing
+    - python: '3.4'
+      before_install: pip install typing
+
+# Prepare the environment
+install:
+  - pip install --user codecov
+
+# Run tests
+script:
+  - pytest --cov=annotypes tests
+
+# submit coverage
+after_script:
+  - codecov
