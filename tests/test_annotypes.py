@@ -101,3 +101,24 @@ class TestComposition(unittest.TestCase):
         assert json.dumps(to_dict(insts[1])) == \
             '{"exposure": 0.1, "path": "/tmp/two"}'
 
+
+class TestEnum(unittest.TestCase):
+    def setUp(self):
+        if sys.version_info < (3,):
+            from annotypes.py2_examples.enumtaker import EnumTaker, Status
+        else:
+            from annotypes.py3_examples.enumtaker import EnumTaker, Status
+        self.cls = EnumTaker
+        self.e = Status
+
+    def test_enum(self):
+        ct = self.cls.call_types
+        assert list(ct) == ['status']
+        assert ct["status"].description == "The status"
+        assert ct["status"].typ == self.e
+        assert self.e['good'].name == 'good'
+        inst = self.cls(self.e.good)
+        assert repr(inst) == \
+            "EnumTaker(status=<Status.good: 0>)"
+        assert json.dumps(to_dict(inst)) == \
+            '{"status": "good"}'

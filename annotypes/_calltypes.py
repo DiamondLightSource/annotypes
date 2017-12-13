@@ -46,7 +46,11 @@ def to_dict(inst):
     # type: (WithCallTypes) -> OrderedDict
     ret = OrderedDict()  # type: OrderedDict
     for k in inst.call_types:
-        ret[k] = getattr(inst, k)
+        value = getattr(inst, k)
+        if hasattr(value, "name"):
+            ret[k] = value.name
+        else:
+            ret[k] = value
     return ret
 
 

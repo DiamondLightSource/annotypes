@@ -23,7 +23,7 @@ class TestMyPy(unittest.TestCase):
         if sys.version_info < (3, 4):
             return
         with open(os.path.join(os.path.dirname(__file__),
-                               "mypy_bad_expected_errors.txt"), 'rb') as f:
+                               "mypy_expected_errors.txt"), 'rb') as f:
             expected = f.read()
         stdout, stderr = mypy("tests/mypy_bad.py")
         assert stdout.splitlines() == expected.splitlines()

@@ -1,0 +1,7 @@
+tests/mypy_bad.py:6: error: Argument 1 to "Simple" has incompatible type "str"; expected "float"
+tests/mypy_bad.py:7: error: Argument 2 to "Simple" has incompatible type "int"; expected "str"
+tests/mypy_bad.py:8: error: Argument 3 to "Long" has incompatible type "int"; expected "Sequence[float]"
+tests/mypy_bad.py:8: error: Argument 5 to "Long" has incompatible type "List[int]"; expected "int"
+tests/mypy_bad.py:9: error: Too few arguments for "CompositionClass"
+tests/mypy_bad.py:9: error: Argument 1 to "CompositionClass" has incompatible type "str"; expected "float"
+tests/mypy_bad.py:10: error: Argument 1 to "EnumTaker" has incompatible type "str"; expected "Status"

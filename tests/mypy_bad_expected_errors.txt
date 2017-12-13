@@ -1,2 +1,0 @@
-tests/mypy_bad.py:4: error: Argument 1 to "Simple" has incompatible type "str"; expected "float"
-tests/mypy_bad.py:5: error: Argument 4 to "Long" has incompatible type "str"; expected "Sequence[float]"

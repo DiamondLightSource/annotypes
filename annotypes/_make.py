@@ -51,6 +51,9 @@ def make_annotations(f, locals_d):
                         # We got more than one argument, so add type comments
                         # to all args of the functions
                         ret.update(zip(args, types))
+                    elif len(args) == 1:
+                        # Only one argument
+                        ret[args[0]] = types
                     else:
                         # We got a single argument, so just type the first ident
                         # on the line
