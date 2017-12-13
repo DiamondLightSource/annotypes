@@ -1,1 +1,1 @@
-mypy_bad.py:3: error: Argument 1 to "Simple" has incompatible type "str"; expected "float"
+tests/mypy_bad.py:3: error: Argument 1 to "Simple" has incompatible type "str"; expected "float"

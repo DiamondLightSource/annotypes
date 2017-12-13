@@ -10,13 +10,15 @@ python:
 matrix:
   include:
     - python: '2.7'
-      before_install: pip install typing
+      env: INSTALL_TYPING=true
     - python: '3.4'
-      before_install: pip install typing
+      env: INSTALL_TYPING=true
 
 # Prepare the environment
 install:
-  - pip install --user codecov
+  - pip install -r requirements/test.txt
+  - if [ "$INSTALL_TYPING" == true ]; then pip install typing; fi
+  - pip install codecov
 
 # Run tests
 script:
