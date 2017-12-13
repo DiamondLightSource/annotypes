@@ -26,5 +26,5 @@ class TestMyPy(unittest.TestCase):
                                "mypy_bad_expected_errors.txt"), 'rb') as f:
             expected = f.read()
         stdout, stderr = mypy("tests/mypy_bad.py")
-        assert stdout == expected
+        assert stdout.splitlines() == expected.splitlines()
         assert not stderr

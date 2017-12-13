@@ -4,7 +4,7 @@ import sys
 
 from annotypes import to_dict, WithCallTypes
 
-from typing import Union, List
+from typing import Sequence
 
 
 class TestAnnotypes(unittest.TestCase):
@@ -55,8 +55,8 @@ class TestLong(unittest.TestCase):
             ['axes', 'units', 'start', 'stop', 'size', 'alternate']
         assert ct["alternate"].description == \
             "Whether to reverse on alternate runs"
-        assert ct["units"].typ == Union[List[str], str]
-        inst = self.cls("x", "mm", 0, 1, 10)
+        assert ct["units"].typ == Sequence[str]
+        inst = self.cls(["x"], ["mm"], [0], [1], 10)
         assert repr(inst) == \
             "Long(axes=['x'], units=['mm'], start=[0], stop=[1], size=10, alternate=False)"
         assert json.dumps(to_dict(inst)) == \
