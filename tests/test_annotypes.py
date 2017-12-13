@@ -2,9 +2,18 @@ import json
 import unittest
 import sys
 
-from annotypes import to_dict
+from annotypes import to_dict, WithCallTypes
 
 from typing import Union, List
+
+
+class TestAnnotypes(unittest.TestCase):
+    def test_no_args_base_repr(self):
+
+        class MyClass(WithCallTypes):
+            pass
+
+        assert repr(MyClass()) == "MyClass()"
 
 
 class TestSimple(unittest.TestCase):
