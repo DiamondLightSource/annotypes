@@ -1,4 +1,8 @@
-from annotypes.typing import Dict, List
+from ._type_checking import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Dict, List
+
 
 WIDGETS = []  # type: List[str]
 """A list of the supported widgets"""
