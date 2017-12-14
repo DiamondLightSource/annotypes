@@ -1,7 +1,7 @@
 from annotypes.py2_examples.simple import Simple
 from annotypes.py2_examples.long import Long
 from annotypes.py2_examples.composition import CompositionClass
-from annotypes.py2_examples.enumtaker import EnumTaker, Status
+from annotypes.py2_examples.enumtaker import EnumTaker
 
 a = Simple("bad")
 b = Simple(45, 46)

@@ -4,7 +4,6 @@ from annotypes import Anno, WithCallTypes
 
 with Anno("The exposure to be active for"):
     Exposure = float
-
 with Anno("The full path to the text file to write"):
     Path = str
 

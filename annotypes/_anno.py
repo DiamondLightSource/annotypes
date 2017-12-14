@@ -3,6 +3,8 @@ import sys
 from ._type_checking import TYPE_CHECKING
 from ._make import make_repr
 
+from typing import Union, Sequence
+
 if TYPE_CHECKING:
     from typing import Dict, Set
 
@@ -27,7 +29,8 @@ class Anno(object):
         self._names_on_enter = None  # type: Set[str]
         self.typ = None  # type: type
         self.name = None  # type: str
-        self.description = description
+        self.is_array = None  # type: bool
+        self.description = description  # type: str
         # TODO: add min, max, maybe widget
 
     def __call__(self, *args, **kwargs):
@@ -43,13 +46,29 @@ class Anno(object):
         # defined
         self._names_on_enter = set(caller_locals())
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is not None:
-            return False
-        locals_d = caller_locals()
+    def _get_defined_name(self, locals_d):
         defined = set(locals_d) - self._names_on_enter
         assert len(defined) == 1, \
             "Expected a single type to be defined, got %s" % list(defined)
         self.name = defined.pop()
-        self.typ = locals_d[self.name]
+
+    def _get_type(self, typ):
+        if getattr(typ, "__origin__", None) == Union:
+            # the type we are interested in is the first parameter
+            typ = typ.__args__[0]
+        if getattr(typ, "__origin__", None) == Sequence:
+            # This is an array
+            self.is_array = True
+            self.typ = typ.__args__[0]
+        else:
+            # This is a bare type
+            self.is_array = False
+            self.typ = typ
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            return False
+        locals_d = caller_locals()
+        self._get_defined_name(locals_d)
+        self._get_type(locals_d[self.name])
         locals_d[self.name] = self

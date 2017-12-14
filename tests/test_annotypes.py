@@ -2,7 +2,7 @@ import json
 import unittest
 import sys
 
-from annotypes import to_dict, WithCallTypes
+from annotypes import WithCallTypes
 
 from typing import Sequence
 
@@ -34,8 +34,6 @@ class TestSimple(unittest.TestCase):
         inst = self.cls(0.1, fname)
         assert repr(inst) == \
             "Simple(exposure=0.1, path='/tmp/fname.txt')"
-        assert json.dumps(to_dict(inst)) == \
-            '{"exposure": 0.1, "path": "/tmp/fname.txt"}'
         inst.write_data("something")
         with open(fname) as f:
             assert f.read() == "Data: something\n"
@@ -55,12 +53,11 @@ class TestLong(unittest.TestCase):
             ['axes', 'units', 'start', 'stop', 'size', 'alternate']
         assert ct["alternate"].description == \
             "Whether to reverse on alternate runs"
-        assert ct["units"].typ == Sequence[str]
-        inst = self.cls(["x"], ["mm"], [0], [1], 10)
+        assert ct["units"].typ == str
+        assert ct["units"].is_array is True
+        inst = self.cls("x", "mm", 0, 1, 10)
         assert repr(inst) == \
-            "Long(axes=['x'], units=['mm'], start=[0], stop=[1], size=10, alternate=False)"
-        assert json.dumps(to_dict(inst)) == \
-            '{"axes": ["x"], "units": ["mm"], "start": [0], "stop": [1], "size": 10, "alternate": false}'
+            "Long(axes=('x',), units=('mm',), start=(0,), stop=(1,), size=10, alternate=False)"
 
 
 class TestComposition(unittest.TestCase):
@@ -84,8 +81,6 @@ class TestComposition(unittest.TestCase):
         inst = self.cls(0.1, "/tmp/fname.txt")
         assert repr(inst) == \
             "CompositionClass(exposure=0.1, path='/tmp/fname.txt')"
-        assert json.dumps(to_dict(inst)) == \
-            '{"exposure": 0.1, "path": "/tmp/fname.txt"}'
 
     def test_composition_func(self):
         ct = self.f.call_types
@@ -98,8 +93,6 @@ class TestComposition(unittest.TestCase):
         insts = self.f(0.1, "/tmp")
         assert repr(insts[0]) == \
             "Simple(exposure=0.1, path='/tmp/one')"
-        assert json.dumps(to_dict(insts[1])) == \
-            '{"exposure": 0.1, "path": "/tmp/two"}'
 
 
 class TestEnum(unittest.TestCase):
@@ -120,5 +113,3 @@ class TestEnum(unittest.TestCase):
         inst = self.cls(self.e.good)
         assert repr(inst) == \
             "EnumTaker(status=<Status.good: 0>)"
-        assert json.dumps(to_dict(inst)) == \
-            '{"status": "good"}'

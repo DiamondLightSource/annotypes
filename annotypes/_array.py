@@ -1,4 +1,4 @@
-from typing import TypeVar, Sequence, Generic, overload
+from typing import TypeVar, Sequence, Generic, overload, Union
 
 
 T = TypeVar("T", str, bool, int, float, covariant=True)
@@ -36,21 +36,13 @@ class Array(Sequence[T], Generic[T]):
     def __getitem__(self, item):
         return self.seq[item]
 
-
-@overload
-def to_array(seq):
-    # type: (Sequence[T]) -> Array[T]
-    pass
-
-
-@overload
-def to_array(*more):
-    # type: (*T) -> Array[T]
-    pass
+    def __repr__(self):
+        return repr(self.seq)
 
 
 def to_array(seq, *more):
-    if isinstance(seq, T):
+    # type: (Union[T, Sequence[T]], *T) -> Array[T]
+    if isinstance(seq, (str, bool, int, float)):
         # First element is a T, so assume *more is seq of T
         seq = (seq,) + more
     elif more:

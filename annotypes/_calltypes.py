@@ -42,18 +42,6 @@ class WithCallTypes(object):
         return repr_str
 
 
-def to_dict(inst):
-    # type: (WithCallTypes) -> OrderedDict
-    ret = OrderedDict()  # type: OrderedDict
-    for k in inst.call_types:
-        value = getattr(inst, k)
-        if hasattr(value, "name"):
-            ret[k] = value.name
-        else:
-            ret[k] = value
-    return ret
-
-
 def add_call_types(f):
     f.call_types = make_call_types(f, caller_locals())
     return f
