@@ -13,14 +13,14 @@ def mypy(path):
 
 class TestMyPy(unittest.TestCase):
     def test_mypy_good(self):
-        if sys.version_info < (3, 4):
+        if sys.version_info < (3, 5):
             return
         stdout, stderr = mypy("tests/mypy_good.py")
         assert not stdout
         assert not stderr
 
     def test_mypy_bad(self):
-        if sys.version_info < (3, 4):
+        if sys.version_info < (3, 5):
             return
         with open(os.path.join(os.path.dirname(__file__),
                                "mypy_expected_errors.txt"), 'rb') as f:
