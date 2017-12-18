@@ -1,19 +1,23 @@
-from annotypes import add_call_types, WithCallTypes, Anno, TYPE_CHECKING
+from annotypes import add_call_types, WithCallTypes, Anno, Array
 from .simple import Simple, Exposure, Path
 
-if TYPE_CHECKING:
-    from typing import List
+from typing import Optional
 
 
 with Anno("The path prefix for the list of writers"):
     Prefix = str
+with Anno("An array of simple objects"):
+    SimpleArray = Array[Simple]
 
 
 @add_call_types
-def composition_func(exposure, prefix):
-    # type: (Exposure, Prefix) -> List[Simple]
-    ret = [Simple(exposure, prefix + suff) for suff in ["/one", "/two"]]
-    return ret
+def composition_func(exposure, prefix=None):
+    # type: (Exposure, Prefix) -> Optional[SimpleArray]
+    if prefix:
+        ret = [Simple(exposure, prefix + suff) for suff in ["/one", "/two"]]
+        return SimpleArray(ret)
+    else:
+        return None
 
 
 class CompositionClass(WithCallTypes):

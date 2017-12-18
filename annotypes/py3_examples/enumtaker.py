@@ -12,7 +12,8 @@ with Anno("The status"):
 
 
 class EnumTaker(WithCallTypes):
-    def __init__(self, status: AStatus):
+    def __init__(self, status):
+        # type: (AStatus) -> None
         if status != Status.good:
             raise ValueError(status)
         else:

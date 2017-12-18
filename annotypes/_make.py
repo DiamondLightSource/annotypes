@@ -2,12 +2,11 @@ import re
 import tokenize
 import inspect
 import sys
-from collections import OrderedDict
 
 from ._type_checking import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Sequence, Callable, Dict, List
+    from typing import Sequence, Callable, Dict, List, Any
 
 
 type_re = re.compile('^# type: ([^-]*)( -> (.*))?$')
@@ -20,8 +19,8 @@ def getargspec(f):
         return inspect.getfullargspec(f)
 
 
-def make_annotations(f, locals_d):
-    # type: (Callable, Dict) -> Dict[str, str]
+def make_annotations(f, locals_d, globals_d):
+    # type: (Callable, Dict, Dict) -> Dict[str, Any]
     """Create an annotations dictionary from Python2 type comments
 
     http://mypy.readthedocs.io/en/latest/python2.html
@@ -34,34 +33,31 @@ def make_annotations(f, locals_d):
     arg_spec = getargspec(f)
     args = [k for k in arg_spec.args if k != "self"]
     it = iter(lines)
-    ret = {}
-    for a in args:
-        ret[a] = 'Any'
-    names = []  # type: List[str]
+    types = []  # type: List
     for token in tokenize.generate_tokens(lambda: next(it)):
         typ, string, start, end, line = token
         if typ == tokenize.COMMENT:
             found = type_re.match(string)
             if found:
                 parts = found.groups()
-                # Can't eval '...' in python2
+                # (...) is used to represent all the args so far
                 if parts[0] != "(...)":
-                    types = eval(parts[0], locals_d, locals())
-                    if isinstance(types, tuple):
-                        # We got more than one argument, so add type comments
-                        # to all args of the functions
-                        ret.update(zip(args, types))
-                    elif len(args) == 1:
-                        # Only one argument
-                        ret[args[0]] = types
+                    ob = eval(parts[0], globals_d, locals_d)
+                    if isinstance(ob, tuple):
+                        # We got more than one argument
+                        types += list(ob)
                     else:
-                        # We got a single argument, so just type the first ident
-                        # on the line
-                        ret[names[0]] = types
-                names = []
-        elif typ == tokenize.NAME:
-            names.append(string)
-    return ret
+                        # We got a single argument
+                        types.append(ob)
+                if parts[1]:
+                    # Got a return, done
+                    ob = eval(parts[2], globals_d, locals_d)
+                    assert len(args) == len(types), \
+                        "Args %r Types %r length mismatch" % (args, types)
+                    ret = dict(zip(args, types))
+                    ret["return"] = ob
+                    return ret
+    raise ValueError("Got to the end of the function without seeing ->")
 
 
 def make_repr(inst, attrs=None):
@@ -78,23 +74,3 @@ def make_repr(inst, attrs=None):
     repr_str = "%s(%s)" % (inst.__class__.__name__, arg_str)
     return repr_str
 
-
-def make_call_types(f, locals_d):
-    # type: (Callable, Dict) -> Dict[str, str]
-    """Make a call_types dictionary that describes what arguments to pass to f
-
-    Args:
-        f: The function to inspect for argument names (without self)
-        locals_d: A dictionary of locals to lookup annotation definitions in
-    """
-    arg_spec = getargspec(f)
-    args = [k for k in arg_spec.args if k != "self"]
-    if not getattr(f, "__annotations__", None):
-        # Make string annotations from the type comment if there is one
-        annotations = make_annotations(f, locals_d)
-    else:
-        annotations = f.__annotations__
-    call_types = OrderedDict()  # type: Dict[str, str]
-    for a in args:
-        call_types[a] = annotations[a]
-    return call_types

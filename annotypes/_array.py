@@ -1,27 +1,24 @@
-from typing import TypeVar, Sequence, Generic, overload, Union
+from typing import TypeVar, Sequence, Generic, overload, Union, Type
 
 
-T = TypeVar("T", str, bool, int, float, covariant=True)
+T = TypeVar("T")
 
 
-def error_message(*args):
-    formatted_args = ", ".join(repr(a) for a in args)
-    message = "Expected to_array(t1, t2, ...) or to_array(seq). " \
-              "Got to_array(%s)" % formatted_args
-    return message
-
-
-class Array(Sequence[T], Generic[T]):
-    """Wrapper that takes a sequence of str, bool, int or float and provides
-    immutable access to it"""
+class Array(Generic[T], Sequence[T]):
+    """Wrapper that takes a sequence and provides immutable access to it"""
 
     def __len__(self):
         # type () -> int
         return len(self.seq)
 
-    def __init__(self, seq):
+    def __init__(self, seq=()):
         self.seq = seq  # type: Sequence[T]
-        self.typ = T
+        orig_class = getattr(self, "__orig_class__", None)
+        assert orig_class, "You should instantiate Array[<typ>](...)"
+        type_args = getattr(orig_class, "__args__", ())
+        assert type_args, "Expected Array[<typ>](...), got Array[%s](...)" % (
+            ", ".join(repr(x) for x in type_args))
+        self.typ = type_args[0]
 
     @overload
     def __getitem__(self, idx):
@@ -40,13 +37,12 @@ class Array(Sequence[T], Generic[T]):
         return repr(self.seq)
 
 
-def to_array(seq, *more):
-    # type: (Union[T, Sequence[T]], *T) -> Array[T]
-    if isinstance(seq, (str, bool, int, float)):
-        # First element is a T, so assume *more is seq of T
-        seq = (seq,) + more
-    elif more:
-        # Assume seq is iterable, so there should be no *more
-        raise ValueError(error_message(seq, *more))
-    assert isinstance(seq, Sequence), "%s is not a sequence" % (seq,)
-    return Array(seq)
+def to_array(typ, seq):
+    # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
+    if isinstance(seq, Array):
+        return seq
+    elif isinstance(seq, str) or not isinstance(seq, Sequence):
+        # Wrap it in a tuple as it should be a sequence
+        return typ((seq,))
+    else:
+        return typ(seq)
