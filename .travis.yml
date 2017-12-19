@@ -6,12 +6,10 @@ python:
   - "3.5"
   - "3.6"
 
-# For Python < 3.5, typing is an optional dependency
+# For Python 2.7, typing is an optional dependency
 matrix:
   include:
     - python: '2.7'
-      env: INSTALL_TYPING=true
-    - python: '3.4'
       env: INSTALL_TYPING=true
 
 # Prepare the environment
