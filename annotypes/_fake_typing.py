@@ -1,81 +1,13 @@
 from __future__ import absolute_import, unicode_literals
 
 import abc
-from abc import abstractmethod, abstractproperty
-import collections
 import functools
-import re as stdlib_re  # Avoid confusion with the re we export.
 import sys
 import types
 try:
     import collections.abc as collections_abc
 except ImportError:
     import collections as collections_abc  # Fallback for PY3.2.
-
-
-# Please keep __all__ alphabetized within each category.
-__all__ = [
-    # Super-special typing primitives.
-    'Any',
-    'Callable',
-    'ClassVar',
-    'Generic',
-    'Optional',
-    'Tuple',
-    'Type',
-    'TypeVar',
-    'Union',
-
-    # ABCs (from collections.abc).
-    'AbstractSet',  # collections.abc.Set.
-    'GenericMeta',  # subclass of abc.ABCMeta and a metaclass
-                    # for 'Generic' and ABCs below.
-    'ByteString',
-    'Container',
-    'ContextManager',
-    'Hashable',
-    'ItemsView',
-    'Iterable',
-    'Iterator',
-    'KeysView',
-    'Mapping',
-    'MappingView',
-    'MutableMapping',
-    'MutableSequence',
-    'MutableSet',
-    'Sequence',
-    'Sized',
-    'ValuesView',
-
-    # Structural checks, a.k.a. protocols.
-    'Reversible',
-    'SupportsAbs',
-    'SupportsComplex',
-    'SupportsFloat',
-    'SupportsInt',
-
-    # Concrete collection types.
-    'Counter',
-    'Deque',
-    'Dict',
-    'DefaultDict',
-    'List',
-    'Set',
-    'FrozenSet',
-    'NamedTuple',  # Not really a type.
-    'Generator',
-
-    # One-off things.
-    'AnyStr',
-    'cast',
-    'get_type_hints',
-    'NewType',
-    'no_type_check',
-    'no_type_check_decorator',
-    'overload',
-    'Text',
-    'TYPE_CHECKING',
-]
 
 # The pseudo-submodules 're' and 'io' are part of the public
 # namespace, but excluded from __all__ because they might stomp on
@@ -192,126 +124,6 @@ class _FinalTypingBase(_TypingBase):
 
     def __reduce__(self):
         return _trim_name(type(self).__name__)
-
-
-class _ForwardRef(_TypingBase):
-    """Internal wrapper to hold a forward reference."""
-
-    __slots__ = ('__forward_arg__', '__forward_code__',
-                 '__forward_evaluated__', '__forward_value__')
-
-    def __init__(self, arg):
-        super(_ForwardRef, self).__init__(arg)
-        if not isinstance(arg, basestring):
-            raise TypeError('Forward reference must be a string -- got %r' % (arg,))
-        try:
-            code = compile(arg, '<string>', 'eval')
-        except SyntaxError:
-            raise SyntaxError('Forward reference must be an expression -- got %r' %
-                              (arg,))
-        self.__forward_arg__ = arg
-        self.__forward_code__ = code
-        self.__forward_evaluated__ = False
-        self.__forward_value__ = None
-
-    def _eval_type(self, globalns, localns):
-        if not self.__forward_evaluated__ or localns is not globalns:
-            if globalns is None and localns is None:
-                globalns = localns = {}
-            elif globalns is None:
-                globalns = localns
-            elif localns is None:
-                localns = globalns
-            self.__forward_value__ = _type_check(
-                eval(self.__forward_code__, globalns, localns),
-                "Forward references must evaluate to types.")
-            self.__forward_evaluated__ = True
-        return self.__forward_value__
-
-    def __eq__(self, other):
-        if not isinstance(other, _ForwardRef):
-            return NotImplemented
-        return (self.__forward_arg__ == other.__forward_arg__ and
-                self.__forward_value__ == other.__forward_value__)
-
-    def __hash__(self):
-        return hash((self.__forward_arg__, self.__forward_value__))
-
-    def __instancecheck__(self, obj):
-        raise TypeError("Forward references cannot be used with isinstance().")
-
-    def __subclasscheck__(self, cls):
-        raise TypeError("Forward references cannot be used with issubclass().")
-
-    def __repr__(self):
-        return '_ForwardRef(%r)' % (self.__forward_arg__,)
-
-
-class _TypeAlias(_TypingBase):
-    """Internal helper class for defining generic variants of concrete types.
-
-    Note that this is not a type; let's call it a pseudo-type.  It cannot
-    be used in instance and subclass checks in parameterized form, i.e.
-    ``isinstance(42, Match[str])`` raises ``TypeError`` instead of returning
-    ``False``.
-    """
-
-    __slots__ = ('name', 'type_var', 'impl_type', 'type_checker')
-
-    def __init__(self, name, type_var, impl_type, type_checker):
-        """Initializer.
-
-        Args:
-            name: The name, e.g. 'Pattern'.
-            type_var: The type parameter, e.g. AnyStr, or the
-                specific type, e.g. str.
-            impl_type: The implementation type.
-            type_checker: Function that takes an impl_type instance.
-                and returns a value that should be a type_var instance.
-        """
-        assert isinstance(name, basestring), repr(name)
-        assert isinstance(impl_type, type), repr(impl_type)
-        assert not isinstance(impl_type, TypingMeta), repr(impl_type)
-        assert isinstance(type_var, (type, _TypingBase)), repr(type_var)
-        self.name = name
-        self.type_var = type_var
-        self.impl_type = impl_type
-        self.type_checker = type_checker
-
-    def __repr__(self):
-        return "%s[%s]" % (self.name, _type_repr(self.type_var))
-
-    def __getitem__(self, parameter):
-        if not isinstance(self.type_var, TypeVar):
-            raise TypeError("%s cannot be further parameterized." % self)
-        if self.type_var.__constraints__ and isinstance(parameter, type):
-            if not issubclass(parameter, self.type_var.__constraints__):
-                raise TypeError("%s is not a valid substitution for %s." %
-                                (parameter, self.type_var))
-        if isinstance(parameter, TypeVar) and parameter is not self.type_var:
-            raise TypeError("%s cannot be re-parameterized." % self)
-        return self.__class__(self.name, parameter,
-                              self.impl_type, self.type_checker)
-
-    def __eq__(self, other):
-        if not isinstance(other, _TypeAlias):
-            return NotImplemented
-        return self.name == other.name and self.type_var == other.type_var
-
-    def __hash__(self):
-        return hash((self.name, self.type_var))
-
-    def __instancecheck__(self, obj):
-        if not isinstance(self.type_var, TypeVar):
-            raise TypeError("Parameterized type aliases cannot be used "
-                            "with isinstance().")
-        return isinstance(obj, self.impl_type)
-
-    def __subclasscheck__(self, cls):
-        if not isinstance(self.type_var, TypeVar):
-            raise TypeError("Parameterized type aliases cannot be used "
-                            "with issubclass().")
-        return issubclass(cls, self.impl_type)
 
 
 def _get_type_vars(types, tvars):
@@ -610,16 +422,7 @@ class TypeVar(_TypingBase):
 # Some unconstrained type variables.  These are used by the container types.
 # (These are not for export.)
 T = TypeVar('T')  # Any type.
-KT = TypeVar('KT')  # Key type.
-VT = TypeVar('VT')  # Value type.
 T_co = TypeVar('T_co', covariant=True)  # Any type covariant containers.
-V_co = TypeVar('V_co', covariant=True)  # Any type covariant containers.
-VT_co = TypeVar('VT_co', covariant=True)  # Value type covariant containers.
-T_contra = TypeVar('T_contra', contravariant=True)  # Ditto contravariant.
-
-# A useful type variable with constraints.  This represents string types.
-# (This one *is* for export!)
-AnyStr = TypeVar('AnyStr', bytes, unicode)
 
 
 def _replace_arg(arg, tvars, args):
@@ -951,21 +754,6 @@ def _gorg(a):
     while a.__origin__ is not None:
         a = a.__origin__
     return a
-
-
-def _geqv(a, b):
-    """Return whether two generic classes are equivalent (internal helper).
-
-    The intention is to consider generic class X and any of its
-    parameterized forms (X[T], X[int], etc.) as equivalent.
-
-    However, X is not equivalent to a subclass of X.
-
-    The relation is reflexive, symmetric and transitive.
-    """
-    assert isinstance(a, GenericMeta) and isinstance(b, GenericMeta)
-    # Reduce each to its origin.
-    return _gorg(a) is _gorg(b)
 
 
 def _next_in_mro(cls):
@@ -1324,26 +1112,7 @@ class Generic(object):
     __slots__ = ()
 
     def __new__(cls, *args, **kwds):
-        if _geqv(cls, Generic):
-            raise TypeError("Type Generic cannot be instantiated; "
-                            "it can be used only as a base class")
         return _generic_new(cls.__next_in_mro__, cls, *args, **kwds)
-
-
-def _get_defaults(func):
-    """Internal helper to extract the default arguments, by name."""
-    code = func.__code__
-    pos_count = code.co_argcount
-    arg_names = code.co_varnames
-    arg_names = arg_names[:pos_count]
-    defaults = func.__defaults__ or ()
-    kwdefaults = func.__kwdefaults__
-    res = dict(kwdefaults) if kwdefaults else {}
-    pos_offset = pos_count - len(defaults)
-    for name, value in zip(arg_names[pos_offset:], defaults):
-        assert name not in res
-        res[name] = value
-    return res
 
 
 def _overload_dummy(*args, **kwds):
