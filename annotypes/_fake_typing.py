@@ -7,32 +7,10 @@ import collections as collections_abc
 
 
 class TypingMeta(type):
-    """Metaclass for most types defined in typing module
-    (not a part of public API).
-
-    This also defines a dummy constructor (all the work for most typing
-    constructs is done in __new__) and a nicer repr().
-    """
-
-    _is_protocol = False
-
     def __new__(cls, name, bases, namespace):
         return super(TypingMeta, cls).__new__(cls, str(name), bases, namespace)
 
     def __init__(self, *args, **kwds):
-        pass
-
-    def _eval_type(self, globalns, localns):
-        """Override this in subclasses to interpret forward references.
-
-        For example, List['C'] is internally stored as
-        List[_ForwardRef('C')], which should evaluate to List[C],
-        where C is an object found in globalns or localns (searching
-        localns first, of course).
-        """
-        return self
-
-    def _get_type_vars(self, tvars):
         pass
 
 
@@ -43,45 +21,6 @@ class _TypingBase(object):
 
     def __init__(self, *args, **kwds):
         pass
-
-    def __new__(cls, *args, **kwds):
-        """Constructor.
-
-        This only exists to give a better error message in case
-        someone tries to subclass a special typing object (not a good idea).
-        """
-        if (len(args) == 3 and
-                isinstance(args[0], str) and
-                isinstance(args[1], tuple)):
-            # Close enough.
-            raise TypeError("Cannot subclass %r" % cls)
-        return super(_TypingBase, cls).__new__(cls)
-
-    # Things that are not classes also need these.
-    def _eval_type(self, globalns, localns):
-        return self
-
-    def _get_type_vars(self, tvars):
-        pass
-
-    def __call__(self, *args, **kwds):
-        raise TypeError("Cannot instantiate %r" % type(self))
-
-
-class _FinalTypingBase(_TypingBase):
-    """Internal mix-in class to prevent instantiation.
-
-    Prevents instantiation unless _root=True is given in class call.
-    It is used to create pseudo-singleton instances Any, Union, Optional, etc.
-    """
-
-    __slots__ = ()
-
-    def __new__(cls, *args, **kwds):
-        self = super(_FinalTypingBase, cls).__new__(cls, *args, **kwds)
-        if '_root' in kwds and kwds['_root'] is True:
-            return self
-        raise TypeError("Cannot instantiate %r" % cls)
 
 
 def _get_type_vars(types, tvars):
@@ -223,8 +162,6 @@ def _replace_arg(arg, tvars, args):
 
     if tvars is None:
         tvars = []
-    if hasattr(arg, '_subs_tree') and isinstance(arg, (GenericMeta, _TypingBase)):
-        return arg._subs_tree(tvars, args)
     if isinstance(arg, TypeVar):
         for i, tvar in enumerate(tvars):
             if arg == tvar:
@@ -242,78 +179,6 @@ def _replace_arg(arg, tvars, args):
 #   e.g., Dict[T, int].__args__ == (T, int).
 
 
-def _subs_tree(cls, tvars=None, args=None):
-    """An internal helper function: calculate substitution tree
-    for generic cls after replacing its type parameters with
-    substitutions in tvars -> args (if any).
-    Repeat the same following __origin__'s.
-
-    Return a list of arguments with all possible substitutions
-    performed. Arguments that are generic classes themselves are represented
-    as tuples (so that no new classes are created by this function).
-    For example: _subs_tree(List[Tuple[int, T]][str]) == [(Tuple, int, str)]
-    """
-
-    if cls.__origin__ is None:
-        return cls
-    # Make of chain of origins (i.e. cls -> cls.__origin__)
-    current = cls.__origin__
-    orig_chain = []
-    while current.__origin__ is not None:
-        orig_chain.append(current)
-        current = current.__origin__
-    # Replace type variables in __args__ if asked ...
-    tree_args = []
-    for arg in cls.__args__:
-        tree_args.append(_replace_arg(arg, tvars, args))
-    # ... then continue replacing down the origin chain.
-    for ocls in orig_chain:
-        new_tree_args = []
-        for arg in ocls.__args__:
-            new_tree_args.append(_replace_arg(arg, ocls.__parameters__, tree_args))
-        tree_args = new_tree_args
-    return tree_args
-
-
-def _remove_dups_flatten(parameters):
-    """An internal helper for Union creation and substitution: flatten Union's
-    among parameters, then remove duplicates and strict subclasses.
-    """
-
-    # Flatten out Union[Union[...], ...].
-    params = []
-    for p in parameters:
-        if isinstance(p, _Union) and p.__origin__ is Union:
-            params.extend(p.__args__)
-        elif isinstance(p, tuple) and len(p) > 0 and p[0] is Union:
-            params.extend(p[1:])
-        else:
-            params.append(p)
-    # Weed out strict duplicates, preserving the first of each occurrence.
-    all_params = set(params)
-    if len(all_params) < len(params):
-        new_params = []
-        for t in params:
-            if t in all_params:
-                new_params.append(t)
-                all_params.remove(t)
-        params = new_params
-        assert not all_params, all_params
-    # Weed out subclasses.
-    # E.g. Union[int, Employee, Manager] == Union[int, Employee].
-    # If object is present it will be sole survivor among proper classes.
-    # Never discard type variables.
-    # (In particular, Union[str, AnyStr] != AnyStr.)
-    all_params = set(params)
-    for t1 in params:
-        if not isinstance(t1, type):
-            continue
-        if any(isinstance(t2, type) and issubclass(t1, t2)
-               for t2 in all_params - {t1}
-               if not (isinstance(t2, GenericMeta) and
-                       t2.__origin__ is not None)):
-            all_params.remove(t1)
-    return tuple(t for t in params if t in all_params)
 
 
 def _check_generic(cls, parameters):
@@ -354,50 +219,7 @@ def _tp_cache(func):
     return inner
 
 
-class _Union(_FinalTypingBase):
-    """Union type; Union[X, Y] means either X or Y.
-
-    To define a union, use e.g. Union[int, str].  Details:
-
-    - The arguments must be types and there must be at least one.
-
-    - None as an argument is a special case and is replaced by
-      type(None).
-
-    - Unions of unions are flattened, e.g.::
-
-        Union[Union[int, str], float] == Union[int, str, float]
-
-    - Unions of a single argument vanish, e.g.::
-
-        Union[int] == int  # The constructor actually returns int
-
-    - Redundant arguments are skipped, e.g.::
-
-        Union[int, str, int] == Union[int, str]
-
-    - When comparing unions, the argument order is ignored, e.g.::
-
-        Union[int, str] == Union[str, int]
-
-    - When two arguments have a subclass relationship, the least
-      derived argument is kept, e.g.::
-
-        class Employee: pass
-        class Manager(Employee): pass
-        Union[int, Employee, Manager] == Union[int, Employee]
-        Union[Manager, int, Employee] == Union[int, Employee]
-        Union[Employee, Manager] == Employee
-
-    - Similar for object::
-
-        Union[int, object] == object
-
-    - You cannot subclass or instantiate a union.
-
-    - You can use Optional[X] as a shorthand for Union[X, None].
-    """
-
+class _Union(_TypingBase):
     __metaclass__ = TypingMeta
     __slots__ = ('__parameters__', '__args__', '__origin__', '__tree_hash__')
 
@@ -412,20 +234,12 @@ class _Union(_FinalTypingBase):
         if not isinstance(parameters, tuple):
             raise TypeError("Expected parameters=<tuple>")
         if origin is Union:
-            parameters = _remove_dups_flatten(parameters)
             # It's not a union if there's only one type left.
             if len(parameters) == 1:
                 return parameters[0]
         self.__parameters__ = _type_vars(parameters)
         self.__args__ = parameters
         self.__origin__ = origin
-        # Pre-calculate the __hash__ on instantiation.
-        # This improves speed for complex substitutions.
-        subs_tree = self._subs_tree()
-        if isinstance(subs_tree, tuple):
-            self.__tree_hash__ = hash(frozenset(subs_tree))
-        else:
-            self.__tree_hash__ = hash(subs_tree)
         return self
 
     def _eval_type(self, globalns, localns):
@@ -457,37 +271,11 @@ class _Union(_FinalTypingBase):
             _check_generic(self, parameters)
         return self.__class__(parameters, origin=self, _root=True)
 
-    def _subs_tree(self, tvars=None, args=None):
-        if self is Union:
-            return Union  # Nothing to substitute
-        tree_args = _subs_tree(self, tvars, args)
-        tree_args = _remove_dups_flatten(tree_args)
-        if len(tree_args) == 1:
-            return tree_args[0]  # Union of a single type is that type
-        return (Union,) + tree_args
 
-    def __eq__(self, other):
-        if isinstance(other, _Union):
-            return self.__tree_hash__ == other.__tree_hash__
-        elif self is not Union:
-            return self._subs_tree() == other
-        else:
-            return self is other
-
-    def __hash__(self):
-        return self.__tree_hash__
-
-    def __instancecheck__(self, obj):
-        raise TypeError("Unions cannot be used with isinstance().")
-
-    def __subclasscheck__(self, cls):
-        raise TypeError("Unions cannot be used with issubclass().")
+Union = _Union()
 
 
-Union = _Union(_root=True)
-
-
-class _Optional(_FinalTypingBase):
+class _Optional(_TypingBase):
     """Optional type.
 
     Optional[X] is equivalent to Union[X, None].
@@ -502,7 +290,7 @@ class _Optional(_FinalTypingBase):
         return Union[arg, type(None)]
 
 
-Optional = _Optional(_root=True)
+Optional = _Optional()
 
 
 def _gorg(a):
@@ -654,8 +442,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
 
         if origin and hasattr(origin, '__qualname__'):  # Fix for Python 3.2.
             self.__qualname__ = origin.__qualname__
-        self.__tree_hash__ = (hash(self._subs_tree()) if origin else
-                              super(GenericMeta, self).__hash__())
         return self
 
     def __init__(self, *args, **kwargs):
@@ -718,22 +504,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
                               origin=ev_origin,
                               extra=self.__extra__,
                               orig_bases=self.__orig_bases__)
-
-    def _subs_tree(self, tvars=None, args=None):
-        if self.__origin__ is None:
-            return self
-        tree_args = _subs_tree(self, tvars, args)
-        return (_gorg(self),) + tuple(tree_args)
-
-    def __eq__(self, other):
-        if not isinstance(other, GenericMeta):
-            return NotImplemented
-        if self.__origin__ is None or other.__origin__ is None:
-            return self is other
-        return self.__tree_hash__ == other.__tree_hash__
-
-    def __hash__(self):
-        return self.__tree_hash__
 
     @_tp_cache
     def __getitem__(self, params):
