@@ -386,28 +386,10 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
             # If not found, tvars is it.
             # Also check for and reject plain Generic,
             # and reject multiple Generic[...].
-            gvars = None
             for base in bases:
-                if base is Generic:
-                    raise TypeError("Cannot inherit from plain Generic")
                 if (isinstance(base, GenericMeta) and
                         base.__origin__ is Generic):
-                    if gvars is not None:
-                        raise TypeError(
-                            "Cannot inherit from Generic[...] multiple types.")
-                    gvars = base.__parameters__
-            if gvars is None:
-                gvars = tvars
-            else:
-                tvarset = set(tvars)
-                gvarset = set(gvars)
-                if not tvarset <= gvarset:
-                    raise TypeError(
-                        "Some type variables (%s) "
-                        "are not listed in Generic[%s]" %
-                        (", ".join(str(t) for t in tvars if t not in gvarset),
-                         ", ".join(str(g) for g in gvars)))
-                tvars = gvars
+                    tvars = base.__parameters__
 
         initial_bases = bases
         if extra is None:
@@ -440,8 +422,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
         ):
             self.__subclasshook__ = _make_subclasshook(self)
 
-        if origin and hasattr(origin, '__qualname__'):  # Fix for Python 3.2.
-            self.__qualname__ = origin.__qualname__
         return self
 
     def __init__(self, *args, **kwargs):
@@ -489,22 +469,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
         if self.__origin__ and self.__parameters__:
             _get_type_vars(self.__parameters__, tvars)
 
-    def _eval_type(self, globalns, localns):
-        ev_origin = (self.__origin__._eval_type(globalns, localns)
-                     if self.__origin__ else None)
-        ev_args = tuple(_eval_type(a, globalns, localns) for a
-                        in self.__args__) if self.__args__ else None
-        if ev_origin == self.__origin__ and ev_args == self.__args__:
-            return self
-        return self.__class__(self.__name__,
-                              self.__bases__,
-                              dict(self.__dict__),
-                              tvars=_type_vars(ev_args) if ev_args else None,
-                              args=ev_args,
-                              origin=ev_origin,
-                              extra=self.__extra__,
-                              orig_bases=self.__orig_bases__)
-
     @_tp_cache
     def __getitem__(self, params):
         if not isinstance(params, tuple):
@@ -512,19 +476,8 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
         msg = "Parameters to generic types must be types."
         params = tuple(_type_check(p, msg) for p in params)
         if self is Generic:
-            # Generic can only be subscripted with unique type variables.
-            if not all(isinstance(p, TypeVar) for p in params):
-                raise TypeError(
-                    "Parameters to Generic[...] must all be type variables")
-            if len(set(params)) != len(params):
-                raise TypeError(
-                    "Parameters to Generic[...] must all be unique")
             tvars = params
             args = params
-        elif self.__origin__ in (Generic,):
-            # Can't subscript Generic[...] or _Protocol[...].
-            raise TypeError("Cannot subscript already-subscripted %s" %
-                            repr(self))
         else:
             # Subscripting a regular Generic subclass.
             _check_generic(self, params)
@@ -562,21 +515,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
             return issubclass(instance.__class__, self)
         return False
 
-    def __copy__(self):
-        return self.__class__(self.__name__, self.__bases__, dict(self.__dict__),
-                              self.__parameters__, self.__args__, self.__origin__,
-                              self.__extra__, self.__orig_bases__)
-
-    def __setattr__(self, attr, value):
-        # We consider all the subscripted genrics as proxies for original class
-        if (
-            attr.startswith('__') and attr.endswith('__') or
-            attr.startswith('_abc_')
-        ):
-            super(GenericMeta, self).__setattr__(attr, value)
-        else:
-            super(GenericMeta, _gorg(self)).__setattr__(attr, value)
-
 
 # Prevent checks for Generic to crash when defining Generic.
 Generic = None
@@ -599,26 +537,6 @@ def _generic_new(base_cls, cls, *args, **kwds):
 
 
 class Generic(object):
-    """Abstract base class for generic types.
-
-    A generic type is typically declared by inheriting from
-    this class parameterized with one or more type variables.
-    For example, a generic mapping type might be defined as::
-
-      class Mapping(Generic[KT, VT]):
-          def __getitem__(self, key: KT) -> VT:
-              ...
-          # Etc.
-
-    This class can then be used as follows::
-
-      def lookup_name(mapping: Mapping[KT, VT], key: KT, default: VT) -> VT:
-          try:
-              return mapping[key]
-          except KeyError:
-              return default
-    """
-
     __metaclass__ = GenericMeta
     __slots__ = ()
 
@@ -627,40 +545,10 @@ class Generic(object):
 
 
 def _overload_dummy(*args, **kwds):
-    """Helper for @overload to raise when called."""
-    raise NotImplementedError(
-        "You should not call an overloaded function. "
-        "A series of @overload-decorated functions "
-        "outside a stub module should always be followed "
-        "by an implementation that is not @overload-ed.")
+    raise NotImplementedError()
 
 
 def overload(func):
-    """Decorator for overloaded functions/methods.
-
-    In a stub file, place two or more stub definitions for the same
-    function in a row, each decorated with @overload.  For example:
-
-      @overload
-      def utf8(value: None) -> None: ...
-      @overload
-      def utf8(value: bytes) -> bytes: ...
-      @overload
-      def utf8(value: str) -> bytes: ...
-
-    In a non-stub file (i.e. a regular .py file), do the same but
-    follow it with an implementation.  The implementation should *not*
-    be decorated with @overload.  For example:
-
-      @overload
-      def utf8(value: None) -> None: ...
-      @overload
-      def utf8(value: bytes) -> bytes: ...
-      @overload
-      def utf8(value: str) -> bytes: ...
-      def utf8(value):
-          # implementation goes here
-    """
     return _overload_dummy
 
 
@@ -669,18 +557,14 @@ class Iterable(Generic[T_co]):
     __extra__ = collections_abc.Iterable
 
 
-Sized = collections_abc.Sized  # Not generic.
-
-
 class Container(Generic[T_co]):
     __slots__ = ()
     __extra__ = collections_abc.Container
 
 
-class Sequence(Sized, Iterable[T_co], Container[T_co]):
+class Sequence(collections_abc.Sized, Iterable[T_co], Container[T_co]):
     __slots__ = ()
     __extra__ = collections_abc.Sequence
 
 
-# Constant that's True when type checking, but False here.
 TYPE_CHECKING = False
