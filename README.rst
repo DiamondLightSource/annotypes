@@ -5,7 +5,9 @@ AnnoTypes
 
 Adding annotations to Python types while still being compatible with mypy
 
-You can write things like::
+You can write things like:
+
+.. code:: python
 
     from annotypes import Anno, WithCallTypes
 
@@ -22,7 +24,9 @@ You can write things like::
             self.path = path
 
 
-or the Python3 alternative::
+or the Python3 alternative:
+
+.. code:: python
 
     from annotypes import Anno, WithCallTypes
 
@@ -37,7 +41,9 @@ or the Python3 alternative::
             self.path = path
 
 
-And at runtime see what you should pass to call it and what it will return::
+And at runtime see what you should pass to call it and what it will return:
+
+.. code:: pycon
 
     >>> from annotypes.py2_examples.simple import Simple
     >>> list(Simple.call_types)
