@@ -35,12 +35,6 @@ def _type_vars(types):
     return tuple(tvars)
 
 
-def _eval_type(t, globalns, localns):
-    if isinstance(t, TypingMeta) or isinstance(t, _TypingBase):
-        return t._eval_type(globalns, localns)
-    return t
-
-
 def _type_check(arg, msg):
     """Check that the argument is a type, and return it (internal helper).
 
@@ -154,21 +148,6 @@ T = TypeVar('T')  # Any type.
 T_co = TypeVar('T_co', covariant=True)  # Any type covariant containers.
 
 
-def _replace_arg(arg, tvars, args):
-    """An internal helper function: replace arg if it is a type variable
-    found in tvars with corresponding substitution from args or
-    with corresponding substitution sub-tree if arg is a generic type.
-    """
-
-    if tvars is None:
-        tvars = []
-    if isinstance(arg, TypeVar):
-        for i, tvar in enumerate(tvars):
-            if arg == tvar:
-                return args[i]
-    return arg
-
-
 # Special typing constructs Union, Optional, Generic, Callable and Tuple
 # use three special attributes for internal bookkeeping of generic types:
 # * __parameters__ is a tuple of unique free type parameters of a generic
@@ -177,19 +156,6 @@ def _replace_arg(arg, tvars, args):
 #   e.g., Union[T, int].__origin__ == Union;
 # * __args__ is a tuple of all arguments used in subscripting,
 #   e.g., Dict[T, int].__args__ == (T, int).
-
-
-
-
-def _check_generic(cls, parameters):
-    # Check correct count for parameters of a generic cls (internal helper).
-    if not cls.__parameters__:
-        raise TypeError("%s is not a generic class" % repr(cls))
-    alen = len(parameters)
-    elen = len(cls.__parameters__)
-    if alen != elen:
-        raise TypeError("Too %s parameters for %s; actual %s, expected %s" %
-                        ("many" if alen > elen else "few", repr(cls), alen, elen))
 
 
 _cleanups = []
@@ -242,16 +208,6 @@ class _Union(_TypingBase):
         self.__origin__ = origin
         return self
 
-    def _eval_type(self, globalns, localns):
-        if self.__args__ is None:
-            return self
-        ev_args = tuple(_eval_type(t, globalns, localns) for t in self.__args__)
-        ev_origin = _eval_type(self.__origin__, globalns, localns)
-        if ev_args == self.__args__ and ev_origin == self.__origin__:
-            # Everything is already evaluated.
-            return self
-        return self.__class__(ev_args, ev_origin, _root=True)
-
     def _get_type_vars(self, tvars):
         if self.__origin__ and self.__parameters__:
             _get_type_vars(self.__parameters__, tvars)
@@ -267,8 +223,6 @@ class _Union(_TypingBase):
         else:
             msg = "Parameters to generic types must be types."
         parameters = tuple(_type_check(p, msg) for p in parameters)
-        if self is not Union:
-            _check_generic(self, parameters)
         return self.__class__(parameters, origin=self, _root=True)
 
 
@@ -480,7 +434,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
             args = params
         else:
             # Subscripting a regular Generic subclass.
-            _check_generic(self, params)
             tvars = _type_vars(params)
             args = params
 
