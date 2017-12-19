@@ -9,8 +9,8 @@ with Anno("An array of simple objects"):
 
 
 @add_call_types
-def composition_func(exposure, prefix=None):
-    # type: (Exposure, Prefix) -> Optional[SimpleArray]
+def composition_func(exposure: Exposure, prefix: Prefix = None
+                     ) -> Optional[SimpleArray]:
     if prefix:
         ret = [Simple(exposure, prefix + suff) for suff in ["/one", "/two"]]
         return SimpleArray(ret)
@@ -19,8 +19,7 @@ def composition_func(exposure, prefix=None):
 
 
 class CompositionClass(WithCallTypes):
-    def __init__(self, exposure, path):
-        # type: (Exposure, Path) -> None
+    def __init__(self, exposure: Exposure, path: Path):
         self.exposure = exposure
         self.path = path
         self.child = Simple(exposure, path)

@@ -25,8 +25,7 @@ with Anno("Whether child block is visible"):
 
 
 class LayoutTable(Table):
-    def __init__(self, name, mri, x, y, visible):
-        # type: (Name, MRI, X, Y, Visible) -> None
+    def __init__(self, name: Name, mri: MRI, x: X, y: Y, visible: Visible):
         self.name = name
         self.mri = mri
         self.x = x
@@ -42,6 +41,5 @@ class Manager(WithCallTypes):
     layout = None  # type: ALayout
 
     @add_call_types
-    def set_layout(self, value):
-        # type: (ALayout) -> None
+    def set_layout(self, value: ALayout):
         self.layout = value

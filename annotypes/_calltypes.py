@@ -73,7 +73,7 @@ def make_call_types(f, locals_d, globals_d):
             "Argument %r has type %r which is not an Anno" % (a, anno)
         call_types[a] = anno
 
-    return_type = anno_with_default(annotations["return"])
+    return_type = anno_with_default(annotations.get("return", None))
     assert return_type is None or isinstance(return_type, Anno), \
         "Return has type %r which is not an Anno" % (return_type,)
 

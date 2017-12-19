@@ -18,14 +18,12 @@ def_units = to_array(Units, "mm")
 
 class ManyArgs(WithCallTypes):
     def __init__(self,
-                 axes,  # type: Union[Axes, Sequence[str], str]
-                 start,  # type: Union[Start, Sequence[float], float]
-                 stop,  # type: Union[Stop, Sequence[float], float]
-                 size,  # type: Size
-                 units=def_units,  # type: Union[Units, Sequence[str], str]
-                 alternate=False  # type: Alternate
-                 ):
-        # type: (...) -> None
+                 axes: Union[Axes, Sequence[str], str],
+                 start: Union[Start, Sequence[float], float],
+                 stop: Union[Stop, Sequence[float], float],
+                 size: Size,
+                 units: Union[Units, Sequence[str], str] = def_units,
+                 alternate: Alternate = False):
         self.axes = to_array(Axes, axes)
         self.start = to_array(Start, start)
         self.stop = to_array(Stop, stop)
