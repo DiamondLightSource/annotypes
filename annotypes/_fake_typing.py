@@ -58,14 +58,13 @@ def _tp_cache(func):
 
 class _Union(_TypingBase):
     __metaclass__ = TypingMeta
-    __slots__ = ('__args__', '__origin__', '__tree_hash__')
+    __slots__ = ('__args__', '__origin__')
 
     def __new__(cls, parameters=None, origin=None, *args, **kwds):
         self = super(_Union, cls).__new__(cls, parameters, origin, *args, **kwds)
         if origin is None:
             self.__args__ = None
             self.__origin__ = None
-            self.__tree_hash__ = hash(frozenset(('Union',)))
             return self
         if not isinstance(parameters, tuple):
             raise TypeError("Expected parameters=<tuple>")

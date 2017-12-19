@@ -21,9 +21,7 @@ class CallTypesMeta(type):
             cls.call_types, _ = make_call_types(f, *caller_locals_globals())
         else:
             cls.call_types = OrderedDict()
-        anno = Anno("Class instance")
-        anno.typ = cls
-        cls.return_type = anno
+        cls.return_type = Anno("Class instance", typ=cls, name="Instance")
         super(CallTypesMeta, cls).__init__(name, bases, dct)
 
 

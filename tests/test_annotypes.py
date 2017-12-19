@@ -2,16 +2,43 @@ import unittest
 import sys
 import collections
 
-from annotypes import WithCallTypes, Array, Sequence
+from annotypes import WithCallTypes, Array, Sequence, Anno, Union
+
+with Anno("Good origin"):
+    Good = str
 
 
 class TestAnnotypes(unittest.TestCase):
     def test_no_args_base_repr(self):
+        assert repr(WithCallTypes()) == "WithCallTypes()"
 
         class MyClass(WithCallTypes):
             pass
 
         assert repr(MyClass()) == "MyClass()"
+
+    def test_anno_inst(self):
+        a = Anno("The arg to take", typ=str, name="MyArg")
+        assert repr(a) == "Anno(name='MyArg', typ=<type 'str'>, description='The arg to take')"
+
+    def test_bad_origin(self):
+        with self.assertRaises(ValueError) as cm:
+            with Anno("Bad origin"):
+                Bad = Union[str, int]
+        assert str(cm.exception) == \
+               "Cannot annotate a type with origin typing.Union"
+
+    def test_good_origin(self):
+        assert isinstance(Good, Anno)
+        assert Good.typ == str
+        assert Good.name == "Good"
+        assert Good.description == "Good origin"
+
+    def test_error_raised(self):
+        with self.assertRaises(IndexError) as cm:
+            with Anno("Bad value"):
+                Bad = [str][1]
+        assert str(cm.exception) == "list index out of range"
 
 
 class TestSimple(unittest.TestCase):

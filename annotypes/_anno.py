@@ -48,7 +48,7 @@ def caller_locals_globals():
         return caller_frame.f_locals, caller_frame.f_globals
 
 
-def make_repr(inst, attrs=None):
+def make_repr(inst, attrs):
     # type: (object, Sequence[str]) -> str
     """Create a repr from an instance of a class
 
@@ -56,25 +56,25 @@ def make_repr(inst, attrs=None):
         inst: The class instance we are generating a repr of
         attrs: The attributes that should appear in the repr
     """
-    if attrs is None:
-        attrs = []
     arg_str = ", ".join("%s=%r" % (a, getattr(inst, a)) for a in attrs)
     repr_str = "%s(%s)" % (inst.__class__.__name__, arg_str)
     return repr_str
 
 
 class Anno(object):
-    def __init__(self, description):
+    def __init__(self, description, typ=None, name=None):
         # type: (str) -> None
         """Annotate a type with run-time accessible metadata
 
         Args:
             description: A one-line description for the argument
+            typ: The type of the Anno, can also be set via context manager
+            name: The name of the Anno, can also be set via context manager
         """
         self._names_on_enter = None  # type: Set[str]
         self.default = NO_DEFAULT  # type: Any
-        self.typ = None  # type: type
-        self.name = None  # type: str
+        self.typ = typ  # type: type
+        self.name = name  # type: str
         self.is_array = None  # type: bool
         self.description = description  # type: str
         # TODO: add min, max, maybe widget
@@ -87,12 +87,22 @@ class Anno(object):
             return self.typ(*args, **kwargs)
 
     def __repr__(self):
-        attrs = ["typ", "description"]
+        attrs = ["name", "typ", "description"]
         return make_repr(self, attrs)
 
     def __enter__(self):
-        # Store the current frame locals so we can work out what has been
-        # defined
+        """Use as a context manager to set typ and name without stamping on
+        the definitions for static analysis. For example:
+
+        >>> with Anno("The arg to take"):
+        ...     MyArg = str
+
+        is equivalent to:
+
+        >>> MyArg = str
+        >>> if not TYPE_CHECKING:
+        ...     MyArg = Anno("The arg to take", typ=str, name="MyArg")
+        """
         self._names_on_enter = set(caller_locals_globals()[0])
 
     def _get_defined_name(self, locals_d):
