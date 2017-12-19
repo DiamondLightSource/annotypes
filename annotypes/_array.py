@@ -1,10 +1,12 @@
-from typing import TypeVar, Sequence, Generic, overload, Union, Type
+from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic
 
+if TYPE_CHECKING:
+    from typing import Union, Type
 
 T = TypeVar("T")
 
 
-class Array(Generic[T], Sequence[T]):
+class Array(Sequence[T], Generic[T]):
     """Wrapper that takes a sequence and provides immutable access to it"""
 
     def __len__(self):

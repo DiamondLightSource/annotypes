@@ -1,7 +1,5 @@
-from annotypes import add_call_types, WithCallTypes, Anno, Array
+from annotypes import add_call_types, WithCallTypes, Anno, Array, Optional
 from .simple import Simple, Exposure, Path
-
-from typing import Optional
 
 
 with Anno("The path prefix for the list of writers"):

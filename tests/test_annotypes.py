@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-from annotypes import WithCallTypes, Array, to_array
+from annotypes import WithCallTypes, Array, Sequence
 
 
 class TestAnnotypes(unittest.TestCase):
@@ -154,8 +154,21 @@ class TestReuse(unittest.TestCase):
 
 
 class TestArray(unittest.TestCase):
+    def test_sequence(self):
+        import collections
+        assert issubclass([].__class__, collections.Sequence)
+        assert isinstance([], collections.Sequence)
+        assert issubclass([].__class__, Sequence)
+        assert isinstance([], Sequence)
+
     def test_array(self):
+        with self.assertRaises(AssertionError):
+            Array()
         self.a = Array[int]()
+        assert isinstance(self.a, Array)
+        assert self.a.typ == int
+        self.b = Array[float]()
+        assert isinstance(self.b, Array)
         assert self.a.typ == int
 
 
@@ -185,3 +198,7 @@ class TestTable(unittest.TestCase):
         assert list(inst.layout.mri) == ["MRI"]
         assert repr(inst) == "Manager()"
         assert repr(layout) == "LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])"
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

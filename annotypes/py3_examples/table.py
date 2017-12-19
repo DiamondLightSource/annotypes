@@ -21,7 +21,7 @@ with Anno("X Coordinate of child block"):
 with Anno("Y Coordinate of child block"):
     Y = Array[float]
 with Anno("Whether child block is visible"):
-    Visible = bool
+    Visible = Array[bool]
 
 
 class LayoutTable(Table):

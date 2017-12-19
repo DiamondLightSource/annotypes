@@ -1,11 +1,41 @@
+import copy
 import sys
 
-from ._type_checking import TYPE_CHECKING
-from ._make import make_repr
+from ._typing import TYPE_CHECKING, Union
 from ._array import Array
 
 if TYPE_CHECKING:
-    from typing import Dict, Set, Tuple, Any
+    from typing import Dict, Set, Tuple, Any, Sequence
+
+
+# Signifies that this is a return value and the default value should be inferred
+RETURN_DEFAULT = object()
+
+# Signifies that no default value has been set
+NO_DEFAULT = object()
+
+
+def anno_with_default(anno, default=RETURN_DEFAULT):
+    origin = getattr(anno, "__origin__", None)
+    if origin == Union:
+        # if any of the types are NoneType then it is optional
+        optional = type(None) in anno.__args__
+        # the anno is actually the first parameter to Optional or Union
+        anno = anno.__args__[0]  # type: Anno
+        assert isinstance(anno, Anno), \
+            "Expected Optional[Anno], Union[Anno,...] or Anno, got %r" % (anno,)
+        # if this is a return type and optional, default should be None
+        if optional:
+            if default is RETURN_DEFAULT:
+                default = None
+            assert default is None, \
+                "Expected Optional[Anno] with default=None, got %r with " \
+                "default=%r" % (anno, default)
+    # Make a copy of the anno with the new default if needed
+    if default not in (RETURN_DEFAULT, NO_DEFAULT):
+        anno = copy.copy(anno)
+        anno.default = default
+    return anno
 
 
 def caller_locals_globals():
@@ -18,7 +48,19 @@ def caller_locals_globals():
         return caller_frame.f_locals, caller_frame.f_globals
 
 
-NO_DEFAULT = object()
+def make_repr(inst, attrs=None):
+    # type: (object, Sequence[str]) -> str
+    """Create a repr from an instance of a class
+
+    Args:
+        inst: The class instance we are generating a repr of
+        attrs: The attributes that should appear in the repr
+    """
+    if attrs is None:
+        attrs = []
+    arg_str = ", ".join("%s=%r" % (a, getattr(inst, a)) for a in attrs)
+    repr_str = "%s(%s)" % (inst.__class__.__name__, arg_str)
+    return repr_str
 
 
 class Anno(object):

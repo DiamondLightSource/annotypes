@@ -1,6 +1,4 @@
-from annotypes import Anno, WithCallTypes, Array, to_array
-
-from typing import Union, Sequence
+from annotypes import Anno, WithCallTypes, Array, to_array, Union, Sequence
 
 with Anno("The scannable axes, e.g. ['x', 'y'] or 'x'"):
     Axes = Array[str]

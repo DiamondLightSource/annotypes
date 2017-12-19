@@ -1,31 +1,17 @@
+import inspect
+import re
+import tokenize
 from collections import OrderedDict
-import copy
 
-from ._make import make_repr, make_annotations, getargspec
-from ._anno import Anno, caller_locals_globals, NO_DEFAULT
-from ._type_checking import TYPE_CHECKING
-
-from typing import Union
+from ._anno import Anno, caller_locals_globals, NO_DEFAULT, make_repr, \
+    anno_with_default
+from ._compat import add_metaclass, getargspec
+from ._typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Dict, Callable, Any, Tuple
+    from typing import Dict, Callable, Any, Tuple, List
 
-
-# Taken from six
-def add_metaclass(metaclass):
-    """Class decorator for creating a class with a metaclass."""
-    def wrapper(cls):
-        orig_vars = cls.__dict__.copy()
-        slots = orig_vars.get('__slots__')
-        if slots is not None:
-            if isinstance(slots, str):
-                slots = [slots]
-            for slots_var in slots:
-                orig_vars.pop(slots_var)
-        orig_vars.pop('__dict__', None)
-        orig_vars.pop('__weakref__', None)
-        return metaclass(cls.__name__, cls.__bases__, orig_vars)
-    return wrapper
+type_re = re.compile('^# type: ([^-]*)( -> (.*))?$')
 
 
 class CallTypesMeta(type):
@@ -51,43 +37,9 @@ class WithCallTypes(object):
         return repr_str
 
 
-def to_dict(inst):
-    # type: (WithCallTypes) -> OrderedDict
-    ret = OrderedDict()  # type: OrderedDict
-    for k in inst.call_types:
-        ret[k] = getattr(inst, k)
-    return ret
-
-
 def add_call_types(f):
     f.call_types, f.return_type = make_call_types(f, *caller_locals_globals())
     return f
-
-
-# A sentinel meaning we were called with no default as it is a return value
-RETURN_DEFAULT = object()
-
-
-def anno_with_default(anno, default=RETURN_DEFAULT):
-    if getattr(anno, "__origin__", None) == Union:
-        # if any of the types are NoneType then it is optional
-        optional = type(None) in anno.__args__
-        # the anno is actually the first parameter to Optional or Union
-        anno = anno.__args__[0]  # type: Anno
-        assert isinstance(anno, Anno), \
-            "Expected Optional[Anno], Union[Anno,...] or Anno, got %r" % (anno,)
-        # if this is a return type and optional, default should be None
-        if optional:
-            if default is RETURN_DEFAULT:
-                default = None
-            assert default is None, \
-                "Expected Optional[Anno] with default=None, got %r with " \
-                "default=%r" % (anno, default)
-    # Make a copy of the anno with the new default if needed
-    if default not in (RETURN_DEFAULT, NO_DEFAULT):
-        anno = copy.copy(anno)
-        anno.default = default
-    return anno
 
 
 def make_call_types(f, locals_d, globals_d):
@@ -126,3 +78,53 @@ def make_call_types(f, locals_d, globals_d):
         "Return has type %r which is not an Anno" % (return_type,)
 
     return call_types, return_type
+
+
+def make_annotations(f, locals_d, globals_d):
+    # type: (Callable, Dict, Dict) -> Dict[str, Any]
+    """Create an annotations dictionary from Python2 type comments
+
+    http://mypy.readthedocs.io/en/latest/python2.html
+
+    Args:
+        f: The function to examine for type comments
+        locals_d: The locals dictionary to get type idents from
+        globals_d: The globals dictionary to get type idents from
+    """
+    lines, _ = inspect.getsourcelines(f)
+    arg_spec = getargspec(f)
+    args = [k for k in arg_spec.args if k != "self"]
+    it = iter(lines)
+    types = []  # type: List
+    for token in tokenize.generate_tokens(lambda: next(it)):
+        typ, string, start, end, line = token
+        if typ == tokenize.COMMENT:
+            found = type_re.match(string)
+            if found:
+                parts = found.groups()
+                # (...) is used to represent all the args so far
+                if parts[0] != "(...)":
+                    try:
+                        ob = eval(parts[0], globals_d, locals_d)
+                    except Exception:
+                        print "***", parts[0]
+                        raise
+                    if isinstance(ob, tuple):
+                        # We got more than one argument
+                        types += list(ob)
+                    else:
+                        # We got a single argument
+                        types.append(ob)
+                if parts[1]:
+                    # Got a return, done
+                    try:
+                        ob = eval(parts[2], globals_d, locals_d)
+                    except Exception:
+                        print "***", parts[2]
+                        raise
+                    assert len(args) == len(types), \
+                        "Args %r Types %r length mismatch" % (args, types)
+                    ret = dict(zip(args, types))
+                    ret["return"] = ob
+                    return ret
+    raise ValueError("Got to the end of the function without seeing ->")
