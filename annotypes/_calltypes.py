@@ -107,7 +107,6 @@ def make_annotations(f, locals_d, globals_d):
                     try:
                         ob = eval(parts[0], globals_d, locals_d)
                     except Exception:
-                        print "***", parts[0]
                         raise
                     if isinstance(ob, tuple):
                         # We got more than one argument
@@ -120,7 +119,6 @@ def make_annotations(f, locals_d, globals_d):
                     try:
                         ob = eval(parts[2], globals_d, locals_d)
                     except Exception:
-                        print "***", parts[2]
                         raise
                     assert len(args) == len(types), \
                         "Args %r Types %r length mismatch" % (args, types)
