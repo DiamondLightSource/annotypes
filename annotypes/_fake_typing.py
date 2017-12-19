@@ -19,13 +19,6 @@ class TypingMeta(type):
     def __new__(cls, name, bases, namespace):
         return super(TypingMeta, cls).__new__(cls, str(name), bases, namespace)
 
-    @classmethod
-    def assert_no_subclassing(cls, bases):
-        for base in bases:
-            if isinstance(base, cls):
-                raise TypeError("Cannot subclass %s" %
-                                (', '.join(map(_type_repr, bases)) or '()'))
-
     def __init__(self, *args, **kwds):
         pass
 
@@ -138,12 +131,6 @@ def _type_check(arg, msg):
     return arg
 
 
-class TypeVarMeta(TypingMeta):
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        return super(TypeVarMeta, cls).__new__(cls, name, bases, namespace)
-
-
 class TypeVar(_TypingBase):
     """Type variable.
 
@@ -186,7 +173,7 @@ class TypeVar(_TypingBase):
       A.__constraints__ == (str, bytes)
     """
 
-    __metaclass__ = TypeVarMeta
+    __metaclass__ = TypingMeta
     __slots__ = ('__name__', '__bound__', '__constraints__',
                  '__covariant__', '__contravariant__')
 
@@ -214,15 +201,6 @@ class TypeVar(_TypingBase):
     def _get_type_vars(self, tvars):
         if self not in tvars:
             tvars.append(self)
-
-    def __repr__(self):
-        if self.__covariant__:
-            prefix = '+'
-        elif self.__contravariant__:
-            prefix = '-'
-        else:
-            prefix = '~'
-        return prefix + self.__name__
 
     def __instancecheck__(self, instance):
         raise TypeError("Type variables cannot be used with isinstance().")
@@ -376,14 +354,6 @@ def _tp_cache(func):
     return inner
 
 
-class UnionMeta(TypingMeta):
-    """Metaclass for Union."""
-
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        return super(UnionMeta, cls).__new__(cls, name, bases, namespace)
-
-
 class _Union(_FinalTypingBase):
     """Union type; Union[X, Y] means either X or Y.
 
@@ -428,7 +398,7 @@ class _Union(_FinalTypingBase):
     - You can use Optional[X] as a shorthand for Union[X, None].
     """
 
-    __metaclass__ = UnionMeta
+    __metaclass__ = TypingMeta
     __slots__ = ('__parameters__', '__args__', '__origin__', '__tree_hash__')
 
     def __new__(cls, parameters=None, origin=None, *args, **kwds):
@@ -471,23 +441,6 @@ class _Union(_FinalTypingBase):
     def _get_type_vars(self, tvars):
         if self.__origin__ and self.__parameters__:
             _get_type_vars(self.__parameters__, tvars)
-
-    def __repr__(self):
-        if self.__origin__ is None:
-            return super(_Union, self).__repr__()
-        tree = self._subs_tree()
-        if not isinstance(tree, tuple):
-            return repr(tree)
-        return tree[0]._tree_repr(tree)
-
-    def _tree_repr(self, tree):
-        arg_list = []
-        for arg in tree[1:]:
-            if not isinstance(arg, tuple):
-                arg_list.append(_type_repr(arg))
-            else:
-                arg_list.append(arg[0]._tree_repr(arg))
-        return super(_Union, self).__repr__() + '[%s]' % ', '.join(arg_list)
 
     @_tp_cache
     def __getitem__(self, parameters):
@@ -534,21 +487,13 @@ class _Union(_FinalTypingBase):
 Union = _Union(_root=True)
 
 
-class OptionalMeta(TypingMeta):
-    """Metaclass for Optional."""
-
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        return super(OptionalMeta, cls).__new__(cls, name, bases, namespace)
-
-
 class _Optional(_FinalTypingBase):
     """Optional type.
 
     Optional[X] is equivalent to Union[X, None].
     """
 
-    __metaclass__ = OptionalMeta
+    __metaclass__ = TypingMeta
     __slots__ = ()
 
     @_tp_cache
@@ -773,22 +718,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
                               origin=ev_origin,
                               extra=self.__extra__,
                               orig_bases=self.__orig_bases__)
-
-    def __repr__(self):
-        if self.__origin__ is None:
-            return super(GenericMeta, self).__repr__()
-        return self._tree_repr(self._subs_tree())
-
-    def _tree_repr(self, tree):
-        arg_list = []
-        for arg in tree[1:]:
-            if arg == ():
-                arg_list.append('()')
-            elif not isinstance(arg, tuple):
-                arg_list.append(_type_repr(arg))
-            else:
-                arg_list.append(arg[0]._tree_repr(arg))
-        return super(GenericMeta, self).__repr__() + '[%s]' % ', '.join(arg_list)
 
     def _subs_tree(self, tvars=None, args=None):
         if self.__origin__ is None:
