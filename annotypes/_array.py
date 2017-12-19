@@ -44,7 +44,7 @@ def to_array(typ, seq):
     if isinstance(seq, Array):
         return seq
     elif isinstance(seq, str) or not isinstance(seq, Sequence):
-        # Wrap it in a tuple as it should be a sequence
-        return typ((seq,))
+        # Wrap it in a list as it should be a sequence
+        return typ([seq])
     else:
         return typ(seq)

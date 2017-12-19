@@ -84,14 +84,14 @@ class TestManyArgs(unittest.TestCase):
         assert ct["start"].is_array is True
         assert ct["units"].typ == str
         assert ct["units"].is_array is True
-        assert ct["units"].default.seq == ("mm",)
+        assert ct["units"].default.seq == ["mm"]
         assert ct["alternate"].description == \
             "Whether to reverse on alternate runs"
         assert ct["alternate"].default is False
         assert self.cls.return_type.typ == self.cls
-        inst = self.cls("x", 0, 1, 10)
+        inst = self.cls("x", [0], 1, 10)
         assert repr(inst) == \
-            "ManyArgs(axes=('x',), start=(0,), stop=(1,), size=10, units=('mm',), alternate=False)"
+            "ManyArgs(axes=['x'], start=[0], stop=[1], size=10, units=['mm'], alternate=False)"
         assert inst.start.typ == float
 
 
