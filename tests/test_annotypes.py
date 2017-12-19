@@ -115,6 +115,9 @@ class TestComposition(unittest.TestCase):
         assert ct["path"].typ == str
         assert self.cls.return_type.typ == self.cls
         inst = self.cls(0.1, "/tmp/fname.txt")
+        inst.write_hello()
+        with open("/tmp/fname.txt") as f:
+            assert f.read() == "Data: hello\n"
         assert repr(inst) == \
             "CompositionClass(exposure=0.1, path='/tmp/fname.txt')"
 
@@ -135,6 +138,7 @@ class TestComposition(unittest.TestCase):
         assert insts.typ.__name__ == "Simple"
         assert repr(insts[0]) == \
             "Simple(exposure=0.1, path='/tmp/one')"
+        assert self.f(1.0) is None
 
 
 class TestEnum(unittest.TestCase):
@@ -156,6 +160,8 @@ class TestEnum(unittest.TestCase):
         inst = self.cls(self.e.good)
         assert repr(inst) == \
             "EnumTaker(status=<Status.good: 0>)"
+        with self.assertRaises(ValueError):
+            self.cls(self.e.bad)
 
 
 class TestReuse(unittest.TestCase):
@@ -228,10 +234,12 @@ class TestTable(unittest.TestCase):
                         Array[float]([0.5]),
                         Array[float]([2.5]),
                         Array[float]([True]))
+        assert layout[0] == ["BLOCK", "MRI", 0.5, 2.5, True]
         inst.set_layout(layout)
         assert list(inst.layout.mri) == ["MRI"]
         assert repr(inst) == "Manager()"
         assert repr(layout) == "LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])"
+        layout.mri = Array[str]()
 
 
 if __name__ == "__main__":
