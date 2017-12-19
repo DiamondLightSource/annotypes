@@ -8,7 +8,7 @@ from ._anno import Anno, caller_locals_globals, NO_DEFAULT, make_repr, \
 from ._compat import add_metaclass, getargspec
 from ._typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict, Callable, Any, Tuple, List
 
 type_re = re.compile('^# type: ([^-]*)( -> (.*))?$')

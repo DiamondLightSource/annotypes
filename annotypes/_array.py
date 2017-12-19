@@ -1,6 +1,6 @@
 from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Union, Type
 
 T = TypeVar("T")
@@ -23,12 +23,12 @@ class Array(Sequence[T], Generic[T]):
         self.typ = type_args[0]
 
     @overload
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):  # pragma: no cover
         # type: (int) -> T
         pass
 
     @overload
-    def __getitem__(self, s):
+    def __getitem__(self, s):  # pragma: no cover
         # type: (slice) -> Sequence[T]
         pass
 
