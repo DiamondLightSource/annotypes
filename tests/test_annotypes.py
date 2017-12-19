@@ -19,20 +19,22 @@ class TestAnnotypes(unittest.TestCase):
 
     def test_anno_inst(self):
         a = Anno("The arg to take", typ=str, name="MyArg")
-        assert repr(a) == "Anno(name='MyArg', typ=<type 'str'>, description='The arg to take')"
+        assert repr(a) == \
+               "Anno(name='MyArg', typ=%r, description='The arg to take')" % str
 
     def test_bad_origin(self):
         with self.assertRaises(ValueError) as cm:
             with Anno("Bad origin"):
                 Bad = Union[str, int]
         assert str(cm.exception) == \
-               "Cannot annotate a type with origin typing.Union"
+               "Cannot annotate a type with origin %r" % Union
 
     def test_good_origin(self):
         assert isinstance(Good, Anno)
         assert Good.typ == str
         assert Good.name == "Good"
         assert Good.description == "Good origin"
+        assert Good(32) == "32"
 
     def test_error_raised(self):
         with self.assertRaises(IndexError) as cm:

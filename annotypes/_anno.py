@@ -63,7 +63,7 @@ def make_repr(inst, attrs):
 
 class Anno(object):
     def __init__(self, description, typ=None, name=None):
-        # type: (str) -> None
+        # type: (str, type, str) -> None
         """Annotate a type with run-time accessible metadata
 
         Args:
