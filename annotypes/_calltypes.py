@@ -104,8 +104,9 @@ def make_annotations(f, locals_d, globals_d):
                 if parts[0] != "(...)":
                     try:
                         ob = eval(parts[0], globals_d, locals_d)
-                    except Exception:
-                        raise
+                    except Exception as e:
+                        raise ValueError(
+                            "Error evaluating %r: %s" % (parts[0], e))
                     if isinstance(ob, tuple):
                         # We got more than one argument
                         types += list(ob)
@@ -116,8 +117,9 @@ def make_annotations(f, locals_d, globals_d):
                     # Got a return, done
                     try:
                         ob = eval(parts[2], globals_d, locals_d)
-                    except Exception:
-                        raise
+                    except Exception as e:
+                        raise ValueError(
+                            "Error evaluating %r: %s" % (parts[2], e))
                     assert len(args) == len(types), \
                         "Args %r Types %r length mismatch" % (args, types)
                     ret = dict(zip(args, types))

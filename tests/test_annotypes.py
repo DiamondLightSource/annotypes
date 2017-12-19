@@ -2,7 +2,8 @@ import unittest
 import sys
 import collections
 
-from annotypes import WithCallTypes, Array, Sequence, Anno, Union
+from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
+    add_call_types
 
 with Anno("Good origin"):
     Good = str
@@ -41,6 +42,37 @@ class TestAnnotypes(unittest.TestCase):
             with Anno("Bad value"):
                 Bad = [str][1]
         assert str(cm.exception) == "list index out of range"
+
+
+class TestWithCallTypes(unittest.TestCase):
+    def test_bad_arg_type(self):
+        with self.assertRaises(ValueError) as cm:
+            @add_call_types
+            def f(arg):
+                # type: (NonExistant) -> None
+                return arg
+        assert str(cm.exception) == \
+            "Error evaluating '(NonExistant)': name 'NonExistant' is not defined"
+
+    def test_no_return(self):
+        with self.assertRaises(ValueError) as cm:
+            @add_call_types
+            def f(arg):
+                # type: (str)
+                return arg
+        assert str(cm.exception) == \
+            "Got to the end of the function without seeing ->"
+
+    def test_bad_return(self):
+        with self.assertRaises(ValueError) as cm:
+            @add_call_types
+            def f(arg):
+                # type: (str) -> Union[Foo]
+                return arg
+        assert str(cm.exception) == \
+            "Error evaluating 'Union[Foo]': name 'Foo' is not defined"
+
+
 
 
 class TestSimple(unittest.TestCase):
