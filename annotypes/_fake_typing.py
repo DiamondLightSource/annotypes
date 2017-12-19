@@ -536,7 +536,7 @@ def _generic_new(base_cls, cls, *args, **kwds):
         return obj
 
 
-class Generic(object):
+class Generic(object):  # type: ignore
     __metaclass__ = GenericMeta
     __slots__ = ()
 
@@ -552,17 +552,17 @@ def overload(func):
     return _overload_dummy
 
 
-class Iterable(Generic[T_co]):
+class Iterable(Generic[T_co]):  # type: ignore
     __slots__ = ()
     __extra__ = collections_abc.Iterable
 
 
-class Container(Generic[T_co]):
+class Container(Generic[T_co]):  # type: ignore
     __slots__ = ()
     __extra__ = collections_abc.Container
 
 
-class Sequence(collections_abc.Sized, Iterable[T_co], Container[T_co]):
+class Sequence(collections_abc.Sized, Iterable[T_co], Container[T_co]):  # type: ignore
     __slots__ = ()
     __extra__ = collections_abc.Sequence
 

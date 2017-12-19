@@ -3,6 +3,6 @@ try:
         TYPE_CHECKING, TypeVar, Sequence, Union, Optional, Generic, overload
     )
 except ImportError:
-    from ._fake_typing import (
+    from ._fake_typing import (  # type: ignore
         TYPE_CHECKING, TypeVar, Sequence, Union, Optional, Generic, overload
     )
