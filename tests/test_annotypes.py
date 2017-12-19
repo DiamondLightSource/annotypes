@@ -1,5 +1,6 @@
 import unittest
 import sys
+import collections
 
 from annotypes import WithCallTypes, Array, Sequence
 
@@ -155,7 +156,6 @@ class TestReuse(unittest.TestCase):
 
 class TestArray(unittest.TestCase):
     def test_sequence(self):
-        import collections
         assert issubclass([].__class__, collections.Sequence)
         assert isinstance([], collections.Sequence)
         assert issubclass([].__class__, Sequence)
@@ -170,6 +170,11 @@ class TestArray(unittest.TestCase):
         self.b = Array[float]()
         assert isinstance(self.b, Array)
         assert self.a.typ == int
+        import numpy as np
+        self.c = Array[int](np.arange(3))
+        assert isinstance(self.c, Array)
+        assert self.c.typ == int
+        assert repr(self.c) == "array([0, 1, 2])"
 
 
 class TestTable(unittest.TestCase):

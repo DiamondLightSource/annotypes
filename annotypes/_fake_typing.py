@@ -3,30 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import abc
 import functools
 import sys
-import types
-try:
-    import collections.abc as collections_abc
-except ImportError:
-    import collections as collections_abc  # Fallback for PY3.2.
-
-# The pseudo-submodules 're' and 'io' are part of the public
-# namespace, but excluded from __all__ because they might stomp on
-# legitimate imports of those modules.
-
-
-def _qualname(x):
-    if sys.version_info[:2] >= (3, 3):
-        return x.__qualname__
-    else:
-        # Fall back to just name.
-        return x.__name__
-
-
-def _trim_name(nm):
-    whitelist = ('_TypeAlias', '_ForwardRef', '_TypingBase', '_FinalTypingBase')
-    if nm.startswith('_') and nm not in whitelist:
-        nm = nm[1:]
-    return nm
+import collections as collections_abc
 
 
 class TypingMeta(type):
@@ -65,10 +42,6 @@ class TypingMeta(type):
     def _get_type_vars(self, tvars):
         pass
 
-    def __repr__(self):
-        qname = _trim_name(_qualname(self))
-        return '%s.%s' % (self.__module__, qname)
-
 
 class _TypingBase(object):
     """Internal indicator of special typing constructs."""
@@ -98,11 +71,6 @@ class _TypingBase(object):
     def _get_type_vars(self, tvars):
         pass
 
-    def __repr__(self):
-        cls = type(self)
-        qname = _trim_name(_qualname(cls))
-        return '%s.%s' % (cls.__module__, qname)
-
     def __call__(self, *args, **kwds):
         raise TypeError("Cannot instantiate %r" % type(self))
 
@@ -121,9 +89,6 @@ class _FinalTypingBase(_TypingBase):
         if '_root' in kwds and kwds['_root'] is True:
             return self
         raise TypeError("Cannot instantiate %r" % cls)
-
-    def __reduce__(self):
-        return _trim_name(type(self).__name__)
 
 
 def _get_type_vars(types, tvars):
@@ -158,8 +123,6 @@ def _type_check(arg, msg):
     """
     if arg is None:
         return type(None)
-    if isinstance(arg, basestring):
-        arg = _ForwardRef(arg)
     if (
         isinstance(arg, _TypingBase) and type(arg).__name__ == '_ClassVar' or
         not isinstance(arg, (type, _TypingBase)) and not callable(arg)
@@ -173,157 +136,6 @@ def _type_check(arg, msg):
     ):
         raise TypeError("Plain %s is not valid as type argument" % arg)
     return arg
-
-
-def _type_repr(obj):
-    """Return the repr() of an object, special-casing types (internal helper).
-
-    If obj is a type, we return a shorter version than the default
-    type.__repr__, based on the module and qualified name, which is
-    typically enough to uniquely identify a type.  For everything
-    else, we fall back on repr(obj).
-    """
-    if isinstance(obj, type) and not isinstance(obj, TypingMeta):
-        if obj.__module__ == '__builtin__':
-            return _qualname(obj)
-        return '%s.%s' % (obj.__module__, _qualname(obj))
-    if obj is Ellipsis:
-        return('...')
-    if isinstance(obj, types.FunctionType):
-        return obj.__name__
-    return repr(obj)
-
-
-class ClassVarMeta(TypingMeta):
-    """Metaclass for _ClassVar"""
-
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        self = super(ClassVarMeta, cls).__new__(cls, name, bases, namespace)
-        return self
-
-
-class _ClassVar(_FinalTypingBase):
-    """Special type construct to mark class variables.
-
-    An annotation wrapped in ClassVar indicates that a given
-    attribute is intended to be used as a class variable and
-    should not be set on instances of that class. Usage::
-
-      class Starship:
-          stats = {}  # type: ClassVar[Dict[str, int]] # class variable
-          damage = 10 # type: int                      # instance variable
-
-    ClassVar accepts only types and cannot be further subscribed.
-
-    Note that ClassVar is not a class itself, and should not
-    be used with isinstance() or issubclass().
-    """
-
-    __metaclass__ = ClassVarMeta
-    __slots__ = ('__type__',)
-
-    def __init__(self, tp=None, _root=False):
-        self.__type__ = tp
-
-    def __getitem__(self, item):
-        cls = type(self)
-        if self.__type__ is None:
-            return cls(_type_check(item,
-                       '{} accepts only types.'.format(cls.__name__[1:])),
-                       _root=True)
-        raise TypeError('{} cannot be further subscripted'
-                        .format(cls.__name__[1:]))
-
-    def _eval_type(self, globalns, localns):
-        return type(self)(_eval_type(self.__type__, globalns, localns),
-                          _root=True)
-
-    def __repr__(self):
-        r = super(_ClassVar, self).__repr__()
-        if self.__type__ is not None:
-            r += '[{}]'.format(_type_repr(self.__type__))
-        return r
-
-    def __hash__(self):
-        return hash((type(self).__name__, self.__type__))
-
-    def __eq__(self, other):
-        if not isinstance(other, _ClassVar):
-            return NotImplemented
-        if self.__type__ is not None:
-            return self.__type__ == other.__type__
-        return self is other
-
-
-ClassVar = _ClassVar(_root=True)
-
-
-class AnyMeta(TypingMeta):
-    """Metaclass for Any."""
-
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        self = super(AnyMeta, cls).__new__(cls, name, bases, namespace)
-        return self
-
-
-class _Any(_FinalTypingBase):
-    """Special type indicating an unconstrained type.
-
-    - Any is compatible with every type.
-    - Any assumed to have all methods.
-    - All values assumed to be instances of Any.
-
-    Note that all the above statements are true from the point of view of
-    static type checkers. At runtime, Any should not be used with instance
-    or class checks.
-    """
-    __metaclass__ = AnyMeta
-    __slots__ = ()
-
-    def __instancecheck__(self, obj):
-        raise TypeError("Any cannot be used with isinstance().")
-
-    def __subclasscheck__(self, cls):
-        raise TypeError("Any cannot be used with issubclass().")
-
-
-Any = _Any(_root=True)
-
-
-class NoReturnMeta(TypingMeta):
-    """Metaclass for NoReturn."""
-
-    def __new__(cls, name, bases, namespace):
-        cls.assert_no_subclassing(bases)
-        self = super(NoReturnMeta, cls).__new__(cls, name, bases, namespace)
-        return self
-
-
-class _NoReturn(_FinalTypingBase):
-    """Special type indicating functions that never return.
-    Example::
-
-      from typing import NoReturn
-
-      def stop() -> NoReturn:
-          raise Exception('no way')
-
-    This type is invalid in other positions, e.g., ``List[NoReturn]``
-    will fail in static type checkers.
-    """
-    __metaclass__ = NoReturnMeta
-    __slots__ = ()
-
-    def __instancecheck__(self, obj):
-        raise TypeError("NoReturn cannot be used with isinstance().")
-
-    def __subclasscheck__(self, cls):
-        raise TypeError("NoReturn cannot be used with issubclass().")
-
-
-NoReturn = _NoReturn(_root=True)
 
 
 class TypeVarMeta(TypingMeta):
@@ -786,6 +598,9 @@ def _make_subclasshook(cls):
             if cls.__extra__ in getattr(subclass, '__mro__', ()):
                 return True
             for scls in cls.__extra__.__subclasses__():
+                # If we have fake typing and typing detect by module name
+                if scls.__class__.__module__ == "typing":
+                    continue
                 if isinstance(scls, GenericMeta):
                     continue
                 if issubclass(subclass, scls):
@@ -995,9 +810,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
     def __getitem__(self, params):
         if not isinstance(params, tuple):
             params = (params,)
-        if not params and not _gorg(self) is Tuple:
-            raise TypeError(
-                "Parameter list to %s[...] cannot be empty" % _qualname(self))
         msg = "Parameters to generic types must be types."
         params = tuple(_type_check(p, msg) for p in params)
         if self is Generic:
