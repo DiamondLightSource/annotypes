@@ -3,7 +3,7 @@ AnnoTypes
 
 |build_status| |coverage|
 
-Adding annotations to Python types while still being compatible with mypy
+Adding annotations to Python types while still being compatible with mypy_ and PyCharm_
 
 You can write things like:
 
@@ -15,7 +15,6 @@ You can write things like:
         Exposure = float
     with Anno("The full path to the text file to write"):
         Path = str
-
 
     class Simple(WithCallTypes):
         def __init__(self, exposure, path="/tmp/file.txt"):
@@ -53,14 +52,8 @@ And at runtime see what you should pass to call it and what it will return:
     >>> Simple.return_type
     Anno(name='Instance', typ=<class 'annotypes.py2_examples.simple.Simple'>, description='Class instance')
 
+
 For more examples see the `Python 2 examples`_ or `Python 3 examples`_.
-
-.. _Python 2 examples:
-    https://github.com/dls-controls/annotypes/tree/master/annotypes/py2_examples
-
-.. _Python 3 examples:
-    https://github.com/dls-controls/annotypes/tree/master/annotypes/py3_examples
-
 
 .. |build_status| image:: https://travis-ci.org/dls-controls/annotypes.svg?branch=master
     :target: https://travis-ci.org/dls-controls/annotypes
@@ -70,3 +63,14 @@ For more examples see the `Python 2 examples`_ or `Python 3 examples`_.
     :target: https://codecov.io/gh/dls-controls/annotypes
     :alt: Test coverage
 
+.. _mypy:
+    http://mypy.readthedocs.io/en/latest/introduction.html
+
+.. _PyCharm:
+    https://www.jetbrains.com/help/pycharm/type-hinting-in-pycharm.html
+
+.. _Python 2 examples:
+    https://github.com/dls-controls/annotypes/tree/master/annotypes/py2_examples
+
+.. _Python 3 examples:
+    https://github.com/dls-controls/annotypes/tree/master/annotypes/py3_examples
