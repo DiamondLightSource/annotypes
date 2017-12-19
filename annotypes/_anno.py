@@ -4,7 +4,7 @@ import sys
 from ._typing import TYPE_CHECKING, Union
 from ._array import Array
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict, Set, Tuple, Any, Sequence
 
 
