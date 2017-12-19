@@ -35,35 +35,6 @@ def _type_vars(types):
     return tuple(tvars)
 
 
-def _type_check(arg, msg):
-    """Check that the argument is a type, and return it (internal helper).
-
-    As a special case, accept None and return type(None) instead.
-    Also, _TypeAlias instances (e.g. Match, Pattern) are acceptable.
-
-    The msg argument is a human-readable error message, e.g.
-
-        "Union[arg, ...]: arg should be a type."
-
-    We append the repr() of the actual value (truncated to 100 chars).
-    """
-    if arg is None:
-        return type(None)
-    if (
-        isinstance(arg, _TypingBase) and type(arg).__name__ == '_ClassVar' or
-        not isinstance(arg, (type, _TypingBase)) and not callable(arg)
-    ):
-        raise TypeError(msg + " Got %.100r." % (arg,))
-    # Bare Union etc. are not valid as type arguments
-    if (
-        type(arg).__name__ in ('_Union', '_Optional') and
-        not getattr(arg, '__origin__', None) or
-        isinstance(arg, TypingMeta) and _gorg(arg) in (Generic,)
-    ):
-        raise TypeError("Plain %s is not valid as type argument" % arg)
-    return arg
-
-
 class TypeVar(_TypingBase):
     """Type variable.
 
@@ -124,12 +95,8 @@ class TypeVar(_TypingBase):
             raise TypeError("Constraints cannot be combined with bound=...")
         if constraints and len(constraints) == 1:
             raise TypeError("A single constraint is not allowed")
-        msg = "TypeVar(name, constraint, ...): constraints must be types."
-        self.__constraints__ = tuple(_type_check(t, msg) for t in constraints)
-        if bound:
-            self.__bound__ = _type_check(bound, "Bound must be a type.")
-        else:
-            self.__bound__ = None
+        self.__constraints__ = tuple(constraints)
+        self.__bound__ = bound
 
     def _get_type_vars(self, tvars):
         if self not in tvars:
@@ -214,15 +181,8 @@ class _Union(_TypingBase):
 
     @_tp_cache
     def __getitem__(self, parameters):
-        if parameters == ():
-            raise TypeError("Cannot take a Union of no types.")
         if not isinstance(parameters, tuple):
             parameters = (parameters,)
-        if self.__origin__ is None:
-            msg = "Union[arg, ...]: each arg must be a type."
-        else:
-            msg = "Parameters to generic types must be types."
-        parameters = tuple(_type_check(p, msg) for p in parameters)
         return self.__class__(parameters, origin=self, _root=True)
 
 
@@ -240,7 +200,6 @@ class _Optional(_TypingBase):
 
     @_tp_cache
     def __getitem__(self, arg):
-        arg = _type_check(arg, "Optional[t] requires a single type.")
         return Union[arg, type(None)]
 
 
@@ -427,8 +386,6 @@ class GenericMeta(TypingMeta, abc.ABCMeta):
     def __getitem__(self, params):
         if not isinstance(params, tuple):
             params = (params,)
-        msg = "Parameters to generic types must be types."
-        params = tuple(_type_check(p, msg) for p in params)
         if self is Generic:
             tvars = params
             args = params
