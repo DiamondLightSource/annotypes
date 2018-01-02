@@ -1,7 +1,7 @@
 AnnoTypes
 =========
 
-|build_status| |coverage|
+|build_status| |coverage| |pypi_version|
 
 Adding annotations to Python types while still being compatible with mypy_ and PyCharm_
 
