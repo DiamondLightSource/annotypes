@@ -103,3 +103,12 @@ APACHE License. (see `LICENSE`_)
 
 .. _Python 3 examples:
     https://github.com/dls-controls/annotypes/tree/master/annotypes/py3_examples
+
+.. _CHANGELOG:
+    https://github.com/dls-controls/annotypes/blob/master/CHANGELOG.rst
+
+.. _CONTRIBUTING:
+    https://github.com/dls-controls/annotypes/blob/master/CONTRIBUTING.rst
+
+.. _LICENSE:
+    https://github.com/dls-controls/annotypes/blob/master/LICENSE
