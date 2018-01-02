@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import abc
 import functools
 import sys
-import collections as collections_abc
+import collections
 
 
 class TypingMeta(type):
@@ -325,17 +325,17 @@ def overload(func):
 
 class Iterable(Generic[T]):  # type: ignore
     __slots__ = ()
-    __extra__ = collections_abc.Iterable
+    __extra__ = collections.Iterable
 
 
 class Container(Generic[T]):  # type: ignore
     __slots__ = ()
-    __extra__ = collections_abc.Container
+    __extra__ = collections.Container
 
 
-class Sequence(collections_abc.Sized, Iterable[T], Container[T]):  # type: ignore
+class Sequence(collections.Sized, Iterable[T], Container[T]):  # type: ignore
     __slots__ = ()
-    __extra__ = collections_abc.Sequence
+    __extra__ = collections.Sequence
 
 
 TYPE_CHECKING = False

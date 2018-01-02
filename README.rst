@@ -55,6 +55,31 @@ And at runtime see what you should pass to call it and what it will return:
 
 For more examples see the `Python 2 examples`_ or `Python 3 examples`_.
 
+Installation
+------------
+To install the latest release, type::
+
+    pip install annotypes
+
+To install the latest code directly from source, type::
+
+    pip install git+git://github.com/dls-controls/annotypes.git
+
+
+Changelog
+---------
+
+See `CHANGELOG`_
+
+Contributing
+------------
+
+See `CONTRIBUTING`_
+
+License
+-------
+APACHE License. (see `LICENSE`_)
+
 .. |build_status| image:: https://travis-ci.org/dls-controls/annotypes.svg?branch=master
     :target: https://travis-ci.org/dls-controls/annotypes
     :alt: Build Status
@@ -62,6 +87,10 @@ For more examples see the `Python 2 examples`_ or `Python 3 examples`_.
 .. |coverage| image:: https://codecov.io/gh/dls-controls/annotypes/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/dls-controls/annotypes
     :alt: Test coverage
+
+.. |pypi_version| image:: https://img.shields.io/pypi/v/annotypes.svg
+    :target: https://pypi.python.org/pypi/annotypes/
+    :alt: Latest PyPI version
 
 .. _mypy:
     http://mypy.readthedocs.io/en/latest/introduction.html
