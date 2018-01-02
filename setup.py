@@ -22,6 +22,8 @@ def get_version():
         raise RuntimeError('Unable to find version string in {0}.'
                            .format(VERSION_FILE))
 
+
+packages = [x for x in find_packages() if x.startswith(module_name)]
 setup(
     name=module_name,
     version=get_version(),
@@ -31,7 +33,7 @@ setup(
     author='Tom Cobb',
     author_email='tom.cobb@diamond.ac.uk',
     keywords='',
-    packages=["annotypes"],
+    packages=packages,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
