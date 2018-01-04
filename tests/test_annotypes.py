@@ -289,11 +289,11 @@ class TestDict(unittest.TestCase):
         assert ct["part_layout"].description == "Layouts for objects"
         assert ct["part_layout"].is_mapping is True
         assert ct["part_layout"].typ == (str, self.t)
-        assert ct["part_layout"].is_mapping is False
-        assert ct["part_layout"].is_array is False
-        assert ct["part_layout"].typ == Any
+        assert ct["value"].is_mapping is False
+        assert ct["value"].is_array is False
+        assert ct["value"].typ == Any
         with self.assertRaises(TypeError):
-            ct["part_layout"](32)
+            ct["value"](32)
         assert self.cls.return_type.typ == self.cls
         layout = self.t(Array[str](["BLOCK"]),
                         Array[str](["MRI"]),

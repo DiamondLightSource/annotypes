@@ -10,6 +10,13 @@ Added:
 
 - Nothing yet
 
+`0-3`_
+------
+
+Added:
+
+- Support for Any
+
 `0-2`_
 ------
 
@@ -29,6 +36,7 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-2...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-3...HEAD
+.. _0-3: https://github.com/dls-controls/annotypes/compare/0-2...0-3
 .. _0-2: https://github.com/dls-controls/annotypes/compare/0-1-1...0-2
 .. _0-1-1: https://github.com/dls-controls/annotypes/compare/0-1...0-1-1
