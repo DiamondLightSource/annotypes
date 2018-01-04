@@ -1,7 +1,7 @@
 import copy
 import sys
 
-from ._typing import TYPE_CHECKING, Union
+from ._typing import TYPE_CHECKING, Union, Mapping
 from ._array import Array
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -76,6 +76,7 @@ class Anno(object):
         self.typ = typ  # type: type
         self.name = name  # type: str
         self.is_array = None  # type: bool
+        self.is_mapping = None  # type: bool
         self.description = description  # type: str
         # TODO: add min, max, maybe widget
 
@@ -83,6 +84,8 @@ class Anno(object):
         """Pass calls through to our underlying type"""
         if self.is_array:
             return Array[self.typ](*args, **kwargs)
+        elif self.is_mapping:
+            raise TypeError("Type Mapping cannot be instantiated")
         else:
             return self.typ(*args, **kwargs)
 
@@ -116,10 +119,19 @@ class Anno(object):
         if origin == Array:
             # This is an array
             self.is_array = True
+            self.is_mapping = False
             self.typ = typ.__args__[0]
+        elif origin == Mapping:
+            # This is a dict
+            self.is_array = False
+            self.is_mapping = True
+            assert len(typ.__args__) == 2, \
+                "Expected Mapping[ktyp, vtyp], got %r" % typ
+            self.typ = typ.__args__
         elif origin is None:
             # This is a bare type
             self.is_array = False
+            self.is_mapping = False
             self.typ = typ
         else:
             raise ValueError("Cannot annotate a type with origin %r" % origin)

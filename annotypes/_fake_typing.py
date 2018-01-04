@@ -27,7 +27,12 @@ class TypeVar(_TypingBase):
     __metaclass__ = TypingMeta
 
 
-T = TypeVar('T')
+# Some unconstrained type variables.  These are used by the container types.
+# (These are not for export.)
+T = TypeVar('T')  # Any type.
+KT = TypeVar('KT')  # Key type.
+VT_co = TypeVar('VT_co', covariant=True)  # Value type covariant containers.
+
 
 _cleanups = []
 
@@ -336,6 +341,12 @@ class Container(Generic[T]):  # type: ignore
 class Sequence(collections.Sized, Iterable[T], Container[T]):  # type: ignore
     __slots__ = ()
     __extra__ = collections.Sequence
+
+
+# NOTE: It is only covariant in the value type.
+class Mapping(collections.Sized, Iterable[KT], Container[KT], Generic[KT, VT_co]):
+    __slots__ = ()
+    __extra__ = collections.Mapping
 
 
 TYPE_CHECKING = False

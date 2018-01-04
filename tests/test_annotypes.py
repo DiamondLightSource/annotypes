@@ -274,5 +274,32 @@ class TestTable(unittest.TestCase):
         layout.mri = Array[str]()
 
 
+class TestDict(unittest.TestCase):
+    def setUp(self):
+        if sys.version_info < (3,):
+            from annotypes.py2_examples.dict import LayoutManager, LayoutTable
+        else:
+            from annotypes.py3_examples.dict import LayoutManager, LayoutTable
+        self.cls = LayoutManager
+        self.t = LayoutTable
+
+    def test_dict(self):
+        ct = self.cls.call_types
+        assert list(ct) == ["part_layout"]
+        assert ct["part_layout"].description == "Layouts for objects"
+        assert ct["part_layout"].is_mapping is True
+        assert ct["part_layout"].typ == (str, self.t)
+        assert self.cls.return_type.typ == self.cls
+        layout = self.t(Array[str](["BLOCK"]),
+                        Array[str](["MRI"]),
+                        Array[float]([0.5]),
+                        Array[float]([2.5]),
+                        Array[float]([True]))
+        part_layout = dict(part=layout)
+        inst = self.cls(part_layout)
+        assert inst.part_layout is part_layout
+        assert repr(inst) == "LayoutManager(part_layout={'part': LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])})"
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
