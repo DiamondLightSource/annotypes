@@ -3,7 +3,7 @@ import sys
 if sys.version_info < (3, 0):
     try:
         from typing import (
-            werwer, TYPE_CHECKING, TypeVar, Sequence, Union, Optional, Generic,
+            TYPE_CHECKING, TypeVar, Sequence, Union, Optional, Generic,
             overload, Mapping
         )
     except ImportError:

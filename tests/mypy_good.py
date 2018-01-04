@@ -4,6 +4,7 @@ from annotypes.py2_examples.manyargs import ManyArgs
 from annotypes.py2_examples.composition import CompositionClass
 from annotypes.py2_examples.enumtaker import EnumTaker, Status
 from annotypes.py2_examples.table import LayoutTable, Manager
+from annotypes.py2_examples.dict import LayoutManager
 
 import numpy as np  # type: ignore
 
@@ -19,3 +20,4 @@ layout = LayoutTable(Array[str](["BLOCK"]),
                      Array[float]([2.5]),
                      Array[bool]([True]))
 Manager().set_layout(layout)
+LayoutManager(dict(part=layout))
