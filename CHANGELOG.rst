@@ -10,6 +10,13 @@ Added:
 
 - Nothing yet
 
+`0-2`_
+------
+
+Added:
+
+- Support for Mapping
+
 `0-1-1`_
 --------
 
@@ -22,5 +29,6 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-1-1...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-2...HEAD
+.. _0-2: https://github.com/dls-controls/annotypes/compare/0-1-1...0-2
 .. _0-1-1: https://github.com/dls-controls/annotypes/compare/0-1...0-1-1
