@@ -26,11 +26,11 @@ class ManyArgs(WithCallTypes):
                  alternate=False  # type: Alternate
                  ):
         # type: (...) -> None
-        self.axes = to_array(Axes, axes)
-        self.start = to_array(Start, start)
-        self.stop = to_array(Stop, stop)
+        self.axes = Axes(axes)
+        self.start = Start(start)
+        self.stop = Stop(stop)
         self.size = size
-        self.units = to_array(Units, units)
+        self.units = Units(units)
         self.alternate = alternate
         assert len(self.axes) == len(self.units) == \
             len(self.start) == len(self.stop), \

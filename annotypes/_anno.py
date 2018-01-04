@@ -2,7 +2,7 @@ import copy
 import sys
 
 from ._typing import TYPE_CHECKING, Union, Mapping
-from ._array import Array
+from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict, Set, Tuple, Any, Sequence
@@ -83,7 +83,7 @@ class Anno(object):
     def __call__(self, *args, **kwargs):
         """Pass calls through to our underlying type"""
         if self.is_array:
-            return Array[self.typ](*args, **kwargs)
+            return to_array(Array[self.typ], *args, **kwargs)
         elif self.is_mapping:
             raise TypeError("Type Mapping cannot be instantiated")
         else:

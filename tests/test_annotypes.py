@@ -2,8 +2,10 @@ import unittest
 import sys
 import collections
 
+import numpy as np
+
 from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
-    add_call_types, Any
+    add_call_types, Any, to_array, array_type
 
 with Anno("Good origin"):
     Good = str
@@ -237,11 +239,26 @@ class TestArray(unittest.TestCase):
         self.b = Array[float]()
         assert isinstance(self.b, Array)
         assert self.a.typ == int
-        import numpy as np
         self.c = Array[int](np.arange(3))
         assert isinstance(self.c, Array)
         assert self.c.typ == int
         assert repr(self.c) == "array([0, 1, 2])"
+
+    def test_to_array(self):
+        inst = Array[int]([1, 2, 3])
+        assert inst is to_array(Array[int], inst)
+        with self.assertRaises(AssertionError):
+            to_array(Array[float], inst)
+
+    def test_array_type(self):
+        assert array_type(Array[int]) is int
+
+    def test_wrong_numpy_type(self):
+        t = Array[np.float64]
+        with self.assertRaises(AssertionError):
+            t(np.arange(43))
+        t(np.arange(43, dtype=float))
+        t(np.arange(43, dtype=np.float64))
 
 
 class TestTable(unittest.TestCase):
