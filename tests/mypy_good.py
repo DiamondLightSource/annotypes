@@ -20,4 +20,4 @@ layout = LayoutTable(Array[str](["BLOCK"]),
                      Array[float]([2.5]),
                      Array[bool]([True]))
 Manager().set_layout(layout)
-LayoutManager(dict(part=layout))
+LayoutManager(dict(part=layout), "book")

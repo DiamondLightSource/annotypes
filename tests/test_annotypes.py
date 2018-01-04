@@ -3,7 +3,7 @@ import sys
 import collections
 
 from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
-    add_call_types
+    add_call_types, Any
 
 with Anno("Good origin"):
     Good = str
@@ -285,10 +285,15 @@ class TestDict(unittest.TestCase):
 
     def test_dict(self):
         ct = self.cls.call_types
-        assert list(ct) == ["part_layout"]
+        assert list(ct) == ["part_layout", "value"]
         assert ct["part_layout"].description == "Layouts for objects"
         assert ct["part_layout"].is_mapping is True
         assert ct["part_layout"].typ == (str, self.t)
+        assert ct["part_layout"].is_mapping is False
+        assert ct["part_layout"].is_array is False
+        assert ct["part_layout"].typ == Any
+        with self.assertRaises(TypeError):
+            ct["part_layout"](32)
         assert self.cls.return_type.typ == self.cls
         layout = self.t(Array[str](["BLOCK"]),
                         Array[str](["MRI"]),
@@ -296,9 +301,9 @@ class TestDict(unittest.TestCase):
                         Array[float]([2.5]),
                         Array[float]([True]))
         part_layout = dict(part=layout)
-        inst = self.cls(part_layout)
+        inst = self.cls(part_layout, 32)
         assert inst.part_layout is part_layout
-        assert repr(inst) == "LayoutManager(part_layout={'part': LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])})"
+        assert repr(inst) == "LayoutManager(part_layout={'part': LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])}, value=32)"
 
 
 if __name__ == "__main__":

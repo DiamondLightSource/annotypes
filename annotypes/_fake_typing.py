@@ -108,6 +108,30 @@ class _Optional(_TypingBase):
 Optional = _Optional()
 
 
+class _Any(_TypingBase):
+    """Special type indicating an unconstrained type.
+
+    - Any is compatible with every type.
+    - Any assumed to have all methods.
+    - All values assumed to be instances of Any.
+
+    Note that all the above statements are true from the point of view of
+    static type checkers. At runtime, Any should not be used with instance
+    or class checks.
+    """
+    __metaclass__ = TypingMeta
+    __slots__ = ()
+
+    def __instancecheck__(self, obj):
+        raise TypeError("Any cannot be used with isinstance().")
+
+    def __subclasscheck__(self, cls):
+        raise TypeError("Any cannot be used with issubclass().")
+
+
+Any = _Any()
+
+
 def _gorg(a):
     """Return the farthest origin of a generic class (internal helper)."""
     assert isinstance(a, GenericMeta)

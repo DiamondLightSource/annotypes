@@ -17,4 +17,4 @@ layout = LayoutTable(Array(["BLOCK"]),
                      [2.5],
                      True)
 Manager().set_layout(None)
-LayoutManager(dict(part=32))
+LayoutManager(dict(part=32), "book")
