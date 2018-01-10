@@ -294,9 +294,9 @@ class TestTable(unittest.TestCase):
 class TestDict(unittest.TestCase):
     def setUp(self):
         if sys.version_info < (3,):
-            from annotypes.py2_examples.dict import LayoutManager, LayoutTable
+            from annotypes.py2_examples.mapping import LayoutManager, LayoutTable
         else:
-            from annotypes.py3_examples.dict import LayoutManager, LayoutTable
+            from annotypes.py3_examples.mapping import LayoutManager, LayoutTable
         self.cls = LayoutManager
         self.t = LayoutTable
 

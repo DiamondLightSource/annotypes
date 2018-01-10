@@ -4,7 +4,7 @@ from annotypes.py2_examples.manyargs import ManyArgs
 from annotypes.py2_examples.composition import CompositionClass
 from annotypes.py2_examples.enumtaker import EnumTaker
 from annotypes.py2_examples.table import LayoutTable, Manager
-from annotypes.py2_examples.dict import LayoutManager
+from annotypes.py2_examples.mapping import LayoutManager
 
 a = Simple("bad")
 b = Simple(45, 46)
