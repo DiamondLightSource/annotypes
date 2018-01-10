@@ -5,7 +5,7 @@ from ._typing import TYPE_CHECKING, Union, Mapping
 from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, Set, Tuple, Any, Sequence
+    from typing import Dict, Set, Tuple, Any, Sequence, Union
 
 
 # Signifies that this is a return value and the default value should be inferred
@@ -73,7 +73,7 @@ class Anno(object):
         """
         self._names_on_enter = None  # type: Set[str]
         self.default = NO_DEFAULT  # type: Any
-        self.typ = typ  # type: type
+        self.typ = typ  # type: Union[Tuple[type], type]
         self.name = name  # type: str
         self.is_array = None  # type: bool
         self.is_mapping = None  # type: bool
