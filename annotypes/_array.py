@@ -47,9 +47,11 @@ class Array(Sequence[T], Generic[T]):
         return repr(self.seq)
 
 
-def to_array(typ, seq):
+def to_array(typ, seq=None):
     # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
-    if isinstance(seq, Array):
+    if seq is None:
+        return typ()
+    elif isinstance(seq, Array):
         expected = array_type(typ)
         assert expected == seq.typ, \
             "Expected Array[%s], got Array[%s]" % (expected, seq.typ)
