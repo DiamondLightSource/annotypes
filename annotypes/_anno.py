@@ -1,12 +1,11 @@
 import copy
 import sys
 
-from ._typing import TYPE_CHECKING, Union, Mapping
+from ._typing import TYPE_CHECKING, Mapping, Union
 from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict, Set, Tuple, Any, Sequence, Union
-
 
 # Signifies that this is a return value and the default value should be inferred
 RETURN_DEFAULT = object()
@@ -38,14 +37,14 @@ def anno_with_default(anno, default=RETURN_DEFAULT):
     return anno
 
 
-def caller_locals_globals():
-    # type: () -> Tuple[Dict, Dict]
+def caller_locals():
+    # type: () -> Dict
     """Return the frame object for the caller's stack frame."""
     try:
         raise ValueError
     except ValueError:
         caller_frame = sys.exc_info()[2].tb_frame.f_back.f_back
-        return caller_frame.f_locals, caller_frame.f_globals
+        return caller_frame.f_locals
 
 
 def make_repr(inst, attrs):
@@ -106,7 +105,7 @@ class Anno(object):
         >>> if not TYPE_CHECKING:
         ...     MyArg = Anno("The arg to take", typ=str, name="MyArg")
         """
-        self._names_on_enter = set(caller_locals_globals()[0])
+        self._names_on_enter = set(caller_locals())
 
     def _get_defined_name(self, locals_d):
         defined = set(locals_d) - self._names_on_enter
@@ -139,7 +138,7 @@ class Anno(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
             return False
-        locals_d = caller_locals_globals()[0]
+        locals_d = caller_locals()
         self._get_defined_name(locals_d)
         self._get_type(locals_d[self.name])
         locals_d[self.name] = self

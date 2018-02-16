@@ -3,8 +3,7 @@ import re
 import tokenize
 from collections import OrderedDict
 
-from ._anno import Anno, caller_locals_globals, NO_DEFAULT, make_repr, \
-    anno_with_default
+from ._anno import Anno, NO_DEFAULT, make_repr, anno_with_default
 from ._compat import add_metaclass, getargspec
 from ._typing import TYPE_CHECKING, GenericMeta, Any
 
@@ -18,7 +17,7 @@ class CallTypesMeta(GenericMeta):
     def __init__(cls, name, bases, dct, **kwargs):
         f = dct.get('__init__', None)
         if f:
-            cls.call_types, _ = make_call_types(f, *caller_locals_globals())
+            cls.call_types, _ = make_call_types(f, f.func_globals)
         else:
             cls.call_types = OrderedDict()
         cls.return_type = Anno("Class instance", typ=cls, name="Instance")
@@ -36,17 +35,16 @@ class WithCallTypes(object):
 
 
 def add_call_types(f):
-    f.call_types, f.return_type = make_call_types(f, *caller_locals_globals())
+    f.call_types, f.return_type = make_call_types(f, f.func_globals)
     return f
 
 
-def make_call_types(f, locals_d, globals_d):
-    # type: (Callable, Dict, Dict) -> Tuple[Dict[str, Anno], Anno]
+def make_call_types(f, globals_d):
+    # type: (Callable, Dict) -> Tuple[Dict[str, Anno], Anno]
     """Make a call_types dictionary that describes what arguments to pass to f
 
     Args:
         f: The function to inspect for argument names (without self)
-        locals_d: A dictionary of locals to lookup annotation definitions in
         globals_d: A dictionary of globals to lookup annotation definitions in
     """
     arg_spec = getargspec(f)
@@ -60,7 +58,7 @@ def make_call_types(f, locals_d, globals_d):
 
     if not getattr(f, "__annotations__", None):
         # Make string annotations from the type comment if there is one
-        annotations = make_annotations(f, locals_d, globals_d)
+        annotations = make_annotations(f, globals_d)
     else:
         annotations = f.__annotations__
 
@@ -78,15 +76,14 @@ def make_call_types(f, locals_d, globals_d):
     return call_types, return_type
 
 
-def make_annotations(f, locals_d, globals_d):
-    # type: (Callable, Dict, Dict) -> Dict[str, Any]
+def make_annotations(f, globals_d):
+    # type: (Callable, Dict) -> Dict[str, Any]
     """Create an annotations dictionary from Python2 type comments
 
     http://mypy.readthedocs.io/en/latest/python2.html
 
     Args:
         f: The function to examine for type comments
-        locals_d: The locals dictionary to get type idents from
         globals_d: The globals dictionary to get type idents from
     """
     lines, _ = inspect.getsourcelines(f)
@@ -103,7 +100,7 @@ def make_annotations(f, locals_d, globals_d):
                 # (...) is used to represent all the args so far
                 if parts[0] != "(...)":
                     try:
-                        ob = eval(parts[0], globals_d, locals_d)
+                        ob = eval(expr, globals_d, {})
                     except Exception as e:
                         raise ValueError(
                             "Error evaluating %r: %s" % (parts[0], e))
@@ -116,7 +113,7 @@ def make_annotations(f, locals_d, globals_d):
                 if parts[1]:
                     # Got a return, done
                     try:
-                        ob = eval(parts[2], globals_d, locals_d)
+                        ob = eval(parts[2], globals_d, {})
                     except Exception as e:
                         raise ValueError(
                             "Error evaluating %r: %s" % (parts[2], e))
