@@ -309,11 +309,16 @@ class TestArray(unittest.TestCase):
         assert array_type(Array[int]) is int
 
     def test_wrong_numpy_type(self):
-        t = Array[np.float64]
+        t = Array[float]
         with self.assertRaises(AssertionError):
-            t(np.arange(43))
-        t(np.arange(43, dtype=float))
-        t(np.arange(43, dtype=np.float64))
+            to_array(t, np.arange(43))
+        to_array(t, np.arange(43, dtype=float))
+        to_array(t, np.arange(43, dtype=np.float64))
+        assert list(to_array(t, np.arange(3, dtype=float))) == [0.0, 1.0, 2.0]
+
+    def test_contains(self):
+        assert 1 in Array[int]([1, 2])
+        assert 0 not in Array[int]([1, 2])
 
 
 class TestTable(unittest.TestCase):

@@ -21,14 +21,17 @@ class Array(Sequence[T], Generic[T]):
         # type () -> int
         return len(self.seq)
 
-    def __init__(self, seq=()):
+    def __init__(self, seq=None):
+        if seq is None:
+            seq = []
         self.seq = seq  # type: Sequence[T]
         orig_class = getattr(self, "__orig_class__", None)
         assert orig_class, "You should instantiate Array[<typ>](...)"
         self.typ = array_type(orig_class)
         if hasattr(seq, "dtype"):
-            assert seq.dtype == self.typ, \
-                "Expected numpy array with type %s, got %s" % (self.typ, seq)
+            assert self.typ == seq.dtype, \
+                "Expected numpy array with dtype %s, got %r with dtype %s" % (
+                    self.typ, seq, seq.dtype)
 
     @overload
     def __getitem__(self, idx):  # pragma: no cover
@@ -49,15 +52,22 @@ class Array(Sequence[T], Generic[T]):
 
 def to_array(typ, seq=None):
     # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
-    if seq is None:
-        return typ()
+    expected = array_type(typ)
+    if hasattr(seq, "dtype"):
+        # It's a numpy array
+        return typ(seq)
     elif isinstance(seq, Array):
-        expected = array_type(typ)
         assert expected == seq.typ, \
             "Expected Array[%s], got Array[%s]" % (expected, seq.typ)
         return seq
+    elif seq is None:
+        return typ()
     elif isinstance(seq, str) or not isinstance(seq, Sequence):
         # Wrap it in a list as it should be a sequence
         return typ([seq])
+    elif len(seq) == 0:
+        # Zero length array
+        return typ()
     else:
+        # It's a sequence, so assume it's ok
         return typ(seq)

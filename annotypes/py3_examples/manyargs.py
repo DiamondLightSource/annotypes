@@ -13,7 +13,7 @@ with Anno("The scannable units, e.g. ['mm', 'deg'] or 'mm'"):
 with Anno("Whether to reverse on alternate runs"):
     Alternate = bool
 
-def_units = to_array(Units, "mm")
+def_units = Units("mm")
 
 
 class ManyArgs(WithCallTypes):

@@ -1,4 +1,4 @@
-from annotypes import Anno, WithCallTypes, Array, to_array, Union, Sequence
+from annotypes import Anno, WithCallTypes, Array, Union, Sequence
 
 with Anno("The scannable axes, e.g. ['x', 'y'] or 'x'"):
     Axes = Array[str]
@@ -13,7 +13,7 @@ with Anno("The scannable units, e.g. ['mm', 'deg'] or 'mm'"):
 with Anno("Whether to reverse on alternate runs"):
     Alternate = bool
 
-def_units = to_array(Units, "mm")
+def_units = Units("mm")
 
 
 class ManyArgs(WithCallTypes):
