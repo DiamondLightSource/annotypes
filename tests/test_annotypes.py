@@ -104,6 +104,24 @@ class TestWithCallTypes(unittest.TestCase):
 
         MyGeneric("32")
 
+    def test_subclassing_with_no_init(self):
+        class Root(WithCallTypes):
+            def __init__(self, name):
+                # type: (Good) -> None
+                self.name = name
+
+        class Sub1(Root):
+            def func(self):
+                pass
+
+        class Sub2(Root):
+            def another_func(self):
+                pass
+
+        assert list(Root.call_types) == ["name"]
+        assert list(Sub1.call_types) == ["name"]
+        assert list(Sub2.call_types) == ["name"]
+
 
 
 class TestSimple(unittest.TestCase):

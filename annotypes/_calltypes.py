@@ -8,7 +8,7 @@ from ._compat import add_metaclass, getargspec
 from ._typing import TYPE_CHECKING, GenericMeta, Any
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, Callable, Any, Tuple, List
+    from typing import Dict, Callable, Tuple, List
 
 type_re = re.compile('^# type: ([^-]*)( -> (.*))?$')
 
@@ -18,10 +18,12 @@ class CallTypesMeta(GenericMeta):
         f = dct.get('__init__', None)
         if f:
             cls.call_types, _ = make_call_types(f, f.func_globals)
+        elif getattr(cls, "call_types", None) is not None:
+            cls.call_types = OrderedDict(cls.call_types)
         else:
             cls.call_types = OrderedDict()
         cls.return_type = Anno("Class instance", typ=cls, name="Instance")
-        super(CallTypesMeta, cls).__init__(name, bases, dct)
+        super(CallTypesMeta, cls).__init__(name, bases, dct, **kwargs)
 
 
 @add_metaclass(CallTypesMeta)
