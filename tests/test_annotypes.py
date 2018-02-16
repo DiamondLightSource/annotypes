@@ -65,6 +65,15 @@ class TestWithCallTypes(unittest.TestCase):
         assert str(cm.exception) == \
             "Got to the end of the function without seeing ->"
 
+    def test_any_return(self):
+        @add_call_types
+        def any_func(**kwargs):
+            # type: (**Any) -> Any
+            return kwargs
+        assert any_func.call_types == {}
+        assert any_func.return_type.typ == Any
+        assert any_func.return_type.description == "Any return value"
+
     def test_bad_return(self):
         with self.assertRaises(ValueError) as cm:
             @add_call_types
