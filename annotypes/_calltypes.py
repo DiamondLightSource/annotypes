@@ -6,7 +6,7 @@ from collections import OrderedDict
 from ._anno import Anno, caller_locals_globals, NO_DEFAULT, make_repr, \
     anno_with_default
 from ._compat import add_metaclass, getargspec
-from ._typing import TYPE_CHECKING
+from ._typing import TYPE_CHECKING, GenericMeta, Any
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Dict, Callable, Any, Tuple, List
@@ -14,8 +14,8 @@ if TYPE_CHECKING:  # pragma: no cover
 type_re = re.compile('^# type: ([^-]*)( -> (.*))?$')
 
 
-class CallTypesMeta(type):
-    def __init__(cls, name, bases, dct):
+class CallTypesMeta(GenericMeta):
+    def __init__(cls, name, bases, dct, **kwargs):
         f = dct.get('__init__', None)
         if f:
             cls.call_types, _ = make_call_types(f, *caller_locals_globals())

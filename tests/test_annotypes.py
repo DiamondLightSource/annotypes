@@ -5,7 +5,7 @@ import collections
 import numpy as np
 
 from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
-    add_call_types, Any, to_array, array_type
+    add_call_types, Any, to_array, array_type, TypeVar, Generic
 
 with Anno("Good origin"):
     Good = str
@@ -74,6 +74,19 @@ class TestWithCallTypes(unittest.TestCase):
         assert str(cm.exception) == \
             "Error evaluating 'Union[Foo]': name 'Foo' is not defined"
 
+    def test_meta_class(self):
+        T = TypeVar("T")
+
+        class MyGeneric(WithCallTypes, Generic[T]):
+            def __init__(self, value):
+                # type: (Good) -> None
+                self.value = value
+
+            def func(self, thing):
+                # type: (T) -> None
+                pass
+
+        MyGeneric("32")
 
 
 
