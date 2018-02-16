@@ -55,7 +55,8 @@ def make_repr(inst, attrs):
         inst: The class instance we are generating a repr of
         attrs: The attributes that should appear in the repr
     """
-    arg_str = ", ".join("%s=%r" % (a, getattr(inst, a)) for a in attrs)
+    arg_str = ", ".join(
+        "%s=%r" % (a, getattr(inst, a)) for a in attrs if hasattr(inst, a))
     repr_str = "%s(%s)" % (inst.__class__.__name__, arg_str)
     return repr_str
 

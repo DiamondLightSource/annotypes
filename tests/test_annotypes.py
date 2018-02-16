@@ -122,6 +122,14 @@ class TestWithCallTypes(unittest.TestCase):
         assert list(Sub1.call_types) == ["name"]
         assert list(Sub2.call_types) == ["name"]
 
+    def test_not_stored_repr(self):
+        class NotStored(WithCallTypes):
+            def __init__(self, a, b):
+                # type: (Good, Good) -> None
+                self.b = b
+
+        o = NotStored("foo", "bar")
+        assert repr(o) == "NotStored(b='bar')"
 
 
 class TestSimple(unittest.TestCase):
