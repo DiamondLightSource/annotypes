@@ -89,6 +89,10 @@ def make_annotations(f, globals_d):
     lines, _ = inspect.getsourcelines(f)
     arg_spec = getargspec(f)
     args = [k for k in arg_spec.args if k != "self"]
+    if arg_spec.varargs is not None:
+        args.append(arg_spec.varargs)
+    if arg_spec.keywords is not None:
+        args.append(arg_spec.keywords)
     it = iter(lines)
     types = []  # type: List
     for token in tokenize.generate_tokens(lambda: next(it)):
@@ -99,11 +103,12 @@ def make_annotations(f, globals_d):
                 parts = found.groups()
                 # (...) is used to represent all the args so far
                 if parts[0] != "(...)":
+                    expr = parts[0].replace("*", "")
                     try:
                         ob = eval(expr, globals_d, {})
                     except Exception as e:
                         raise ValueError(
-                            "Error evaluating %r: %s" % (parts[0], e))
+                            "Error evaluating %r: %s" % (expr, e))
                     if isinstance(ob, tuple):
                         # We got more than one argument
                         types += list(ob)

@@ -74,6 +74,13 @@ class TestWithCallTypes(unittest.TestCase):
         assert str(cm.exception) == \
             "Error evaluating 'Union[Foo]': name 'Foo' is not defined"
 
+    def test_kwargs(self):
+        @add_call_types
+        def f(v, *args, **kwargs):
+            # type: (Good, *Any, **Any) -> None
+            pass
+        assert list(f.call_types) == ["v"]
+
     def test_meta_class(self):
         T = TypeVar("T")
 
