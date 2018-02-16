@@ -4,7 +4,7 @@ import tokenize
 from collections import OrderedDict
 
 from ._anno import Anno, NO_DEFAULT, make_repr, anno_with_default
-from ._compat import add_metaclass, getargspec
+from ._compat import add_metaclass, getargspec, func_globals
 from ._typing import TYPE_CHECKING, GenericMeta, Any
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -17,7 +17,7 @@ class CallTypesMeta(GenericMeta):
     def __init__(cls, name, bases, dct, **kwargs):
         f = dct.get('__init__', None)
         if f:
-            cls.call_types, _ = make_call_types(f, f.func_globals)
+            cls.call_types, _ = make_call_types(f, func_globals(f))
         elif getattr(cls, "call_types", None) is not None:
             cls.call_types = OrderedDict(cls.call_types)
         else:
@@ -37,7 +37,7 @@ class WithCallTypes(object):
 
 
 def add_call_types(f):
-    f.call_types, f.return_type = make_call_types(f, f.func_globals)
+    f.call_types, f.return_type = make_call_types(f, func_globals(f))
     return f
 
 

@@ -18,3 +18,10 @@ def getargspec(f):
         return inspect.getargspec(f)
     else:
         return inspect.getfullargspec(f)
+
+
+def func_globals(f):
+    if sys.version_info < (3,):
+        return f.func_globals
+    else:
+        return f.__globals__
