@@ -63,7 +63,7 @@ def make_repr(inst, attrs):
 
 class Anno(object):
     def __init__(self, description, typ=None, name=None, default=NO_DEFAULT):
-        # type: (str, type, str, Any) -> None
+        # type: (str, Any, str, Any) -> None
         """Annotate a type with run-time accessible metadata
 
         Args:
@@ -73,7 +73,7 @@ class Anno(object):
         """
         self._names_on_enter = None  # type: Set[str]
         self.default = default  # type: Any
-        self.typ = typ  # type: Union[Tuple[type], type]
+        self.typ = typ  # type: Any
         self.name = name  # type: str
         self.is_array = None  # type: bool
         self.is_mapping = None  # type: bool

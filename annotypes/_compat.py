@@ -1,6 +1,11 @@
 import inspect
 import sys
 
+from ._typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Callable
+
 
 # Taken from six
 def add_metaclass(metaclass):
@@ -14,10 +19,13 @@ def add_metaclass(metaclass):
 
 
 def getargspec(f):
+    # type: (Callable) -> inspect.ArgSpec
     if sys.version_info < (3,):
-        return inspect.getargspec(f)
+        args, varargs, keywords, defaults = inspect.getargspec(f)
     else:
-        return inspect.getfullargspec(f)
+        # Need to use fullargspec in case there are annotations
+        args, varargs, keywords, defaults = inspect.getfullargspec(f)[:4]
+    return inspect.ArgSpec(args, varargs, keywords, defaults)
 
 
 def func_globals(f):
