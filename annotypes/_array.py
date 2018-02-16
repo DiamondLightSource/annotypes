@@ -46,6 +46,13 @@ class Array(Sequence[T], Generic[T]):
     def __getitem__(self, item):
         return self.seq[item]
 
+    def __eq__(self, other):
+        # type: (object) -> bool
+        if isinstance(other, Array):
+            return self.typ == other.typ and self.seq == other.seq
+        else:
+            return self.seq == other
+
     def __repr__(self):
         return "Array(%r)" % (self.seq,)
 

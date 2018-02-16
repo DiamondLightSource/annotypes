@@ -316,6 +316,11 @@ class TestArray(unittest.TestCase):
         to_array(t, np.arange(43, dtype=np.float64))
         assert list(to_array(t, np.arange(3, dtype=float))) == [0.0, 1.0, 2.0]
 
+    def test_eq(self):
+        assert Array[int]() != Array[float]()
+        assert Array[int]([]) == Array[int]([])
+        assert Array[int]([1, 2]) == [1, 2]
+
     def test_contains(self):
         assert 1 in Array[int]([1, 2])
         assert 0 not in Array[int]([1, 2])
