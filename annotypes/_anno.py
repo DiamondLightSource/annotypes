@@ -61,8 +61,8 @@ def make_repr(inst, attrs):
 
 
 class Anno(object):
-    def __init__(self, description, typ=None, name=None):
-        # type: (str, type, str) -> None
+    def __init__(self, description, typ=None, name=None, default=NO_DEFAULT):
+        # type: (str, type, str, Any) -> None
         """Annotate a type with run-time accessible metadata
 
         Args:
@@ -71,7 +71,7 @@ class Anno(object):
             name: The name of the Anno, can also be set via context manager
         """
         self._names_on_enter = None  # type: Set[str]
-        self.default = NO_DEFAULT  # type: Any
+        self.default = default  # type: Any
         self.typ = typ  # type: Union[Tuple[type], type]
         self.name = name  # type: str
         self.is_array = None  # type: bool
