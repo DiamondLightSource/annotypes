@@ -136,9 +136,9 @@ class TestManyArgs(unittest.TestCase):
             "Whether to reverse on alternate runs"
         assert ct["alternate"].default is False
         assert self.cls.return_type.typ == self.cls
-        inst = self.cls("x", [0], 1, 10)
+        inst = self.cls("x", [0.], 1., 10)
         assert repr(inst) == \
-            "ManyArgs(axes=['x'], start=[0], stop=[1], size=10, units=['mm'], alternate=False)"
+            "ManyArgs(axes=Array(['x']), start=Array([0.0]), stop=Array([1.0]), size=10, units=Array(['mm']), alternate=False)"
         assert inst.start.typ == float
 
 
@@ -255,7 +255,7 @@ class TestArray(unittest.TestCase):
         self.c = Array[int](np.arange(3))
         assert isinstance(self.c, Array)
         assert self.c.typ == int
-        assert repr(self.c) == "array([0, 1, 2])"
+        assert repr(self.c) == "Array(array([0, 1, 2]))"
 
     def test_to_array(self):
         inst = Array[int]([1, 2, 3])
@@ -300,7 +300,8 @@ class TestTable(unittest.TestCase):
         inst.set_layout(layout)
         assert list(inst.layout.mri) == ["MRI"]
         assert repr(inst) == "Manager()"
-        assert repr(layout) == "LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])"
+        assert repr(layout) == \
+            "LayoutTable(name=Array(['BLOCK']), mri=Array(['MRI']), x=Array([0.5]), y=Array([2.5]), visible=Array([True]))"
         layout.mri = Array[str]()
 
 
@@ -333,7 +334,8 @@ class TestDict(unittest.TestCase):
         part_layout = dict(part=layout)
         inst = self.cls(part_layout, 32)
         assert inst.part_layout is part_layout
-        assert repr(inst) == "LayoutManager(part_layout={'part': LayoutTable(name=['BLOCK'], mri=['MRI'], x=[0.5], y=[2.5], visible=[True])}, value=32)"
+        assert repr(inst) == \
+               "LayoutManager(part_layout={'part': LayoutTable(name=Array(['BLOCK']), mri=Array(['MRI']), x=Array([0.5]), y=Array([2.5]), visible=Array([True]))}, value=32)"
 
 
 if __name__ == "__main__":

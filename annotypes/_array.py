@@ -44,7 +44,7 @@ class Array(Sequence[T], Generic[T]):
         return self.seq[item]
 
     def __repr__(self):
-        return repr(self.seq)
+        return "Array(%r)" % (self.seq,)
 
 
 def to_array(typ, seq=None):
