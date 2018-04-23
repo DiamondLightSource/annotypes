@@ -53,7 +53,5 @@ Before a new release, please go through the following checklist:
 * Bump version in annotypes/version.py
 * Add a release note in CHANGELOG.rst
 * Git tag the version
-* Upload to pypi::
-
-    make publish
+* Push to github and travis will make a release on pypi
 

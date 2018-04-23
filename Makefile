@@ -23,12 +23,6 @@ install: dist
 		--record=installed.files \
 		--prefix=$(PREFIX) dist/*.egg
 
-# Upload to pypi
-publish:
-	$(PYTHON) setup.py sdist upload -r pypi
-
+# Upload to test pypi
 testpublish:
 	$(PYTHON) setup.py sdist upload -r pypitest
-
-test:
-	PYTHONPATH=../scanpointgenerator $(PYTHON) setup.py test
