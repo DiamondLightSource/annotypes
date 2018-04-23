@@ -80,7 +80,27 @@ def make_call_types(f, globals_d):
     return call_types, return_type
 
 
-def make_annotations(f, globals_d):
+class EchoStr(str):
+    def __getitem__(self, item):
+        if isinstance(item, tuple):
+            # obj["x", "y"] is obj.__getitem__(("x", "y"))
+            str_items = []
+            for x in item:
+                if x is Ellipsis:
+                    str_items.append("...")
+                else:
+                    str_items.append(str(x))
+            item = ", ".join(str_items)
+        return "%s[%s]" % (self, item)
+
+
+class EchoDict(object):
+    # A fake globals dictionary that just returns the string back
+    def __getitem__(self, item):
+        return EchoStr(item)
+
+
+def make_annotations(f, globals_d=None):
     # type: (Callable, Dict) -> Dict[str, Any]
     """Create an annotations dictionary from Python2 type comments
 
@@ -88,8 +108,15 @@ def make_annotations(f, globals_d):
 
     Args:
         f: The function to examine for type comments
-        globals_d: The globals dictionary to get type idents from
+        globals_d: The globals dictionary to get type idents from. If not
+            specified then make the annotations dict contain strings rather
+            than the looked up objects
     """
+    if globals_d is None:
+        globals_d = {}
+        locals_d = EchoDict()
+    else:
+        locals_d = {}
     lines, _ = inspect.getsourcelines(f)
     arg_spec = getargspec(f)
     args = [k for k in arg_spec.args if k != "self"]
@@ -99,6 +126,7 @@ def make_annotations(f, globals_d):
         args.append(arg_spec.keywords)
     it = iter(lines)
     types = []  # type: List
+    found = None
     for token in tokenize.generate_tokens(lambda: next(it)):
         typ, string, start, end, line = token
         if typ == tokenize.COMMENT:
@@ -109,7 +137,7 @@ def make_annotations(f, globals_d):
                 if parts[0] != "(...)":
                     expr = parts[0].replace("*", "")
                     try:
-                        ob = eval(expr, globals_d, {})
+                        ob = eval(expr, globals_d, locals_d)
                     except Exception as e:
                         raise ValueError(
                             "Error evaluating %r: %s" % (expr, e))
@@ -122,7 +150,7 @@ def make_annotations(f, globals_d):
                 if parts[1]:
                     # Got a return, done
                     try:
-                        ob = eval(parts[2], globals_d, {})
+                        ob = eval(parts[2], globals_d, locals_d)
                     except Exception as e:
                         raise ValueError(
                             "Error evaluating %r: %s" % (parts[2], e))
@@ -131,4 +159,6 @@ def make_annotations(f, globals_d):
                     ret = dict(zip(args, types))
                     ret["return"] = ob
                     return ret
-    raise ValueError("Got to the end of the function without seeing ->")
+    if found:
+        # If we have ever found a type comment, but not the return value, error
+        raise ValueError("Got to the end of the function without seeing ->")

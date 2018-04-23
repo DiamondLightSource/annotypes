@@ -5,7 +5,8 @@ import collections
 import numpy as np
 
 from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
-    add_call_types, Any, to_array, array_type, TypeVar, Generic
+    add_call_types, Any, to_array, array_type, TypeVar, Generic, \
+    make_annotations
 
 with Anno("Good origin"):
     Good = str
@@ -89,6 +90,22 @@ class TestWithCallTypes(unittest.TestCase):
             # type: (Good, *Any, **Any) -> None
             pass
         assert list(f.call_types) == ["v"]
+
+    def test_make_annotations_no_globals(self):
+        def f(a, b):
+            # type: (Dict[Callable[..., int],  Union[str, int, None]], Bad) -> None
+            return
+
+        annotations = make_annotations(f)
+        assert annotations == {"a": "Dict[Callable[..., int], Union[str, int, None]]",
+                               "b": "Bad", "return": None}
+
+    def test_make_annotations_no_comments(self):
+        def f(a, b):
+            return
+
+        annotations = make_annotations(f)
+        assert annotations is None
 
     def test_meta_class(self):
         T = TypeVar("T")
