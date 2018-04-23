@@ -10,6 +10,12 @@ Added:
 
 - Nothing yet
 
+`0-6`_ - 2018-04-23
+-------------------
+
+Added:
+- Add make_annotations to public API, and allow globals_d to be optional
+
 `0-5`_ - 2018-02-16
 -------------------
 
@@ -66,7 +72,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-5...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-6...HEAD
+.. _0-6: https://github.com/dls-controls/annotypes/compare/0-5...0-6
 .. _0-5: https://github.com/dls-controls/annotypes/compare/0-4...0-5
 .. _0-4: https://github.com/dls-controls/annotypes/compare/0-3...0-4
 .. _0-3: https://github.com/dls-controls/annotypes/compare/0-2...0-3
