@@ -105,7 +105,7 @@ class TestWithCallTypes(unittest.TestCase):
             return
 
         annotations = make_annotations(f)
-        assert annotations is None
+        assert annotations == {}
 
     def test_meta_class(self):
         T = TypeVar("T")

@@ -94,7 +94,7 @@ class EchoStr(str):
         return "%s[%s]" % (self, item)
 
 
-class EchoDict(object):
+class EchoDict(dict):
     # A fake globals dictionary that just returns the string back
     def __getitem__(self, item):
         return EchoStr(item)
@@ -112,11 +112,10 @@ def make_annotations(f, globals_d=None):
             specified then make the annotations dict contain strings rather
             than the looked up objects
     """
+    locals_d = {}  # type: Dict[str, Any]
     if globals_d is None:
         globals_d = {}
         locals_d = EchoDict()
-    else:
-        locals_d = {}
     lines, _ = inspect.getsourcelines(f)
     arg_spec = getargspec(f)
     args = [k for k in arg_spec.args if k != "self"]
@@ -162,3 +161,4 @@ def make_annotations(f, globals_d=None):
     if found:
         # If we have ever found a type comment, but not the return value, error
         raise ValueError("Got to the end of the function without seeing ->")
+    return {}
