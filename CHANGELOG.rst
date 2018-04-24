@@ -10,6 +10,12 @@ Added:
 
 - Nothing yet
 
+`0-7`_ - 2018-04-24
+-------------------
+
+Fixed:
+- make_annotations now always returns a dict
+
 `0-6`_ - 2018-04-23
 -------------------
 
@@ -72,7 +78,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-6...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-7...HEAD
+.. _0-7: https://github.com/dls-controls/annotypes/compare/0-6...0-7
 .. _0-6: https://github.com/dls-controls/annotypes/compare/0-5...0-6
 .. _0-5: https://github.com/dls-controls/annotypes/compare/0-4...0-5
 .. _0-4: https://github.com/dls-controls/annotypes/compare/0-3...0-4
