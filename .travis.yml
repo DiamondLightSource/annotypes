@@ -33,5 +33,5 @@ deploy:
     secure: Lu+segQLtqANnzt2c3zT/dDHztZjPMFeZ6SG7toR8qphBc4Lk8VMRubc1iFC/kwochV55G6/3J6BOyHnoOatCOa1/Ok1HN0XPo1M+1Il2qZsTHKTIwDRjunU00K0LVnA1CCqaCyd7udZAOnOLubU+fRg4MizYGEi49whOCuKnbc9Yxfdaw4zy1kw9BMfEKUunirL2L9aMgf7TiDV2tRuyobWPssFekL1HfPQVuhkhFTsNVRTGtUjIZxrcrTPvRuPpJoLlS1kbnSSQTIf+qw1ecRG0K+1zpPq2Tgdj1bkile0ylXbArK7TYIhasfa3yFtxSsrZ0qgU028V0woT5aE/Yntjysp5/UtKTMJ8tLw7cJk8BQFiHAQ1Inb7/S27E5i2NcO2ljDJ8w3RFdcsh5P/NfWs5DRoIfD6G0HWZMsGjIdO7TRnfJidjcS2WziwsY+q9KyJtvcu6QVs7TMMOhIuYo2zlWJ1K0msL/GHluQxKUaUjBb4S8DnwjBezVR2oy5OZiLYmeNjVhgk4nCNU5Lb0ypNlufRj7lqi0Tjh/1XKX6v/VF0x9MX0SIowAn5hwHpSk29UQ5mgUfm6MC2yLdk6W/vt3OQY9pxXNmdh6DLkc3nngN/Qq8KelQ3ZzY2GxKAs7cWp7Nwzj6BLgI6p55HZFyZol/BykuuevF7ee91kU=
   on:
     tags: True
-    # As we are doing a source dist 
+    # As we are doing a source dist, only deploy for one python
     python: "3.6"

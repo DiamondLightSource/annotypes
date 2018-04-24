@@ -14,12 +14,14 @@ Added:
 -------------------
 
 Fixed:
+
 - make_annotations now always returns a dict
 
 `0-6`_ - 2018-04-23
 -------------------
 
 Added:
+
 - Add make_annotations to public API, and allow globals_d to be optional
 
 `0-5`_ - 2018-02-16
