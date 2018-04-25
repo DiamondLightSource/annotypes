@@ -93,6 +93,9 @@ class EchoStr(str):
             item = ", ".join(str_items)
         return "%s[%s]" % (self, item)
 
+    def __getattr__(self, item):
+        return "%s.%s" % (self, item)
+
 
 class EchoDict(dict):
     # A fake globals dictionary that just returns the string back

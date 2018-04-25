@@ -107,6 +107,14 @@ class TestWithCallTypes(unittest.TestCase):
         annotations = make_annotations(f)
         assert annotations == {}
 
+    def test_make_annotations_attr(self):
+        def f(a):
+            # type: (np.number) -> None
+            return
+
+        annotations = make_annotations(f)
+        assert annotations == {"a": "np.number", 'return': None}
+
     def test_meta_class(self):
         T = TypeVar("T")
 
