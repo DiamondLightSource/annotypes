@@ -107,6 +107,21 @@ class TestWithCallTypes(unittest.TestCase):
         annotations = make_annotations(f)
         assert annotations == {}
 
+    def test_make_annotations_self(self):
+        class A(object):
+            def f(self, a):
+                # type: (int) -> None
+                return
+            @classmethod
+            def c(cls, a):
+                # type: (T, str) -> str
+                return a
+
+        annotations1 = make_annotations(A.f)
+        assert annotations1 == {"a": "int", "return": None}
+        annotations2 = make_annotations(A.c)
+        assert annotations2 == {"cls": "T", "a": "str", "return": "str"}
+
     def test_make_annotations_attr(self):
         def f(a):
             # type: (np.number) -> None

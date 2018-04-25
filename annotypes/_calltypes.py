@@ -117,11 +117,18 @@ def make_annotations(f, globals_d=None):
     """
     locals_d = {}  # type: Dict[str, Any]
     if globals_d is None:
+        # If not given a globals_d then we should just populate annotations with
+        # the strings in the type comment.
         globals_d = {}
+        # The current approach is to use eval, which means manufacturing a
+        # dict like object that will just echo the string back to you. This
+        # has a number of complexities for somthing like numpy.number or
+        # Callable[..., int], which are handled in EchoStr above, so it might be
+        # better off as an ast.parse in the future...
         locals_d = EchoDict()
     lines, _ = inspect.getsourcelines(f)
     arg_spec = getargspec(f)
-    args = [k for k in arg_spec.args if k != "self"]
+    args = list(arg_spec.args)
     if arg_spec.varargs is not None:
         args.append(arg_spec.varargs)
     if arg_spec.keywords is not None:
@@ -156,6 +163,10 @@ def make_annotations(f, globals_d=None):
                     except Exception as e:
                         raise ValueError(
                             "Error evaluating %r: %s" % (parts[2], e))
+                    if args and args[0] in ["self", "cls"]:
+                        # Allow the first argument to be inferred
+                        if len(args) == len(types) + 1:
+                            args = args[1:]
                     assert len(args) == len(types), \
                         "Args %r Types %r length mismatch" % (args, types)
                     ret = dict(zip(args, types))
