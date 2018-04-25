@@ -10,6 +10,14 @@ Added:
 
 - Nothing yet
 
+`0-8`_ - 2018-04-25
+-------------------
+
+Fixed:
+
+- self and cls as first arguments are now optionally given types
+- make_annotations with optional globals_d now works with dotted names
+
 `0-7`_ - 2018-04-24
 -------------------
 
@@ -80,7 +88,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-7...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-8...HEAD
+.. _0-8: https://github.com/dls-controls/annotypes/compare/0-7...0-8
 .. _0-7: https://github.com/dls-controls/annotypes/compare/0-6...0-7
 .. _0-6: https://github.com/dls-controls/annotypes/compare/0-5...0-6
 .. _0-5: https://github.com/dls-controls/annotypes/compare/0-4...0-5
