@@ -5,7 +5,7 @@ from ._typing import TYPE_CHECKING, Mapping, Union
 from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, Set, Tuple, Any, Sequence, Union
+    from typing import Dict, Set, Optional, Any, Sequence, Union
 
 # Signifies that this is a return value and the default value should be inferred
 RETURN_DEFAULT = object()
@@ -14,13 +14,14 @@ RETURN_DEFAULT = object()
 NO_DEFAULT = object()
 
 
-def anno_with_default(anno, default=RETURN_DEFAULT):
-    origin = getattr(anno, "__origin__", None)
+def anno_with_default(src, default=RETURN_DEFAULT):
+    # type: (Any, Any) -> Anno
+    origin = getattr(src, "__origin__", None)
     if origin == Union:
         # if any of the types are NoneType then it is optional
-        optional = type(None) in anno.__args__
+        optional = type(None) in src.__args__
         # the anno is actually the first parameter to Optional or Union
-        anno = anno.__args__[0]  # type: Anno
+        anno = src.__args__[0]  # type: Anno
         assert isinstance(anno, Anno), \
             "Expected Optional[Anno], Union[Anno,...] or Anno, got %r" % (anno,)
         # if this is a return type and optional, default should be None
@@ -30,6 +31,8 @@ def anno_with_default(anno, default=RETURN_DEFAULT):
             assert default is None, \
                 "Expected Optional[Anno] with default=None, got %r with " \
                 "default=%r" % (anno, default)
+    else:
+        anno = src
     # Make a copy of the anno with the new default if needed
     if default not in (RETURN_DEFAULT, NO_DEFAULT):
         anno = copy.copy(anno)
@@ -43,7 +46,9 @@ def caller_locals():
     try:
         raise ValueError
     except ValueError:
-        caller_frame = sys.exc_info()[2].tb_frame.f_back.f_back
+        _, _, tb = sys.exc_info()
+        assert tb, "Can't get traceback, this shouldn't happen"
+        caller_frame = tb.tb_frame.f_back.f_back
         return caller_frame.f_locals
 
 
@@ -71,12 +76,12 @@ class Anno(object):
             typ: The type of the Anno, can also be set via context manager
             name: The name of the Anno, can also be set via context manager
         """
-        self._names_on_enter = None  # type: Set[str]
+        self._names_on_enter = None  # type: Optional[Set[str]]
         self.default = default  # type: Any
         self.typ = typ  # type: Any
-        self.name = name  # type: str
-        self.is_array = None  # type: bool
-        self.is_mapping = None  # type: bool
+        self.name = name  # type: Optional[str]
+        self.is_array = None  # type: Optional[bool]
+        self.is_mapping = None  # type: Optional[bool]
         self.description = description  # type: str
         # TODO: add min, max, maybe widget
 

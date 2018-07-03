@@ -361,6 +361,11 @@ class TestArray(unittest.TestCase):
         assert Array[int]([]) == Array[int]([])
         assert Array[int]([1, 2]) == [1, 2]
 
+    def test_numpy_eq(self):
+        a1, a2 = Array[int](np.arange(3)), Array[int](np.arange(3))
+        assert a1 == a2
+        np.testing.assert_equal(a1, a2)
+
     def test_contains(self):
         assert 1 in Array[int]([1, 2])
         assert 0 not in Array[int]([1, 2])

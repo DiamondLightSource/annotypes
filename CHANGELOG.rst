@@ -6,9 +6,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased`_
 -------------
 
-Added:
+Fixed:
 
-- Nothing yet
+- Make Array.__eq__ behave like list.__eq__ even with numpy arrays
 
 `0-8`_ - 2018-04-25
 -------------------

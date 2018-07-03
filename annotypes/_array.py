@@ -14,6 +14,16 @@ def array_type(cls):
     return type_args[0]
 
 
+def compare_seq(seq, other):
+    # Do the native compare
+    equal = seq == other
+    if hasattr(equal, "any"):
+        # numpy overrides == to give an ndarray of the differences. If any
+        # elements are different then the Array is different
+        equal = equal.any()
+    return equal
+
+
 class Array(Sequence[T], Generic[T]):
     """Wrapper that takes a sequence and provides immutable access to it"""
 
@@ -49,9 +59,9 @@ class Array(Sequence[T], Generic[T]):
     def __eq__(self, other):
         # type: (object) -> bool
         if isinstance(other, Array):
-            return self.typ == other.typ and self.seq == other.seq
+            return self.typ == other.typ and compare_seq(self.seq, other.seq)
         else:
-            return self.seq == other
+            return compare_seq(self.seq, other)
 
     def __repr__(self):
         return "Array(%r)" % (self.seq,)
