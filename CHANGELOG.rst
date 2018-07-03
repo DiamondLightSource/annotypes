@@ -8,6 +8,13 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Fixed:
 
+- Nothing yet
+
+`0-9`_ - 2018-07-03
+-------------------
+
+Fixed:
+
 - Make Array.__eq__ behave like list.__eq__ even with numpy arrays
 
 `0-8`_ - 2018-04-25
@@ -88,7 +95,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-8...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-9...HEAD
+.. _0-9: https://github.com/dls-controls/annotypes/compare/0-8...0-9
 .. _0-8: https://github.com/dls-controls/annotypes/compare/0-7...0-8
 .. _0-7: https://github.com/dls-controls/annotypes/compare/0-6...0-7
 .. _0-6: https://github.com/dls-controls/annotypes/compare/0-5...0-6
