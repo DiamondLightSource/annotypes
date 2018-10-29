@@ -10,6 +10,13 @@ Fixed:
 
 - Nothing yet
 
+`0-9-1`_ - 2018-10-29
+-------------------
+
+Fixed:
+
+- Fix "make install" step in Makefile used at Diamond Light Source
+
 `0-9`_ - 2018-07-03
 -------------------
 
