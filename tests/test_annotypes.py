@@ -360,6 +360,11 @@ class TestArray(unittest.TestCase):
         assert Array[int]() != Array[float]()
         assert Array[int]([]) == Array[int]([])
         assert Array[int]([1, 2]) == [1, 2]
+        assert Array[int]([1, 2]) != [2, 2]
+        assert not (Array[int]([1, 2]) == [2, 2])
+        assert Array[int]([1, 2]) == np.array([1, 2])
+        assert Array[int]([1, 2]) != np.array([2, 2])
+        assert not (Array[int]([1, 2]) == np.array([2, 2]))
 
     def test_numpy_eq(self):
         a1, a2 = Array[int](np.arange(3)), Array[int](np.arange(3))
