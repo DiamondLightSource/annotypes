@@ -10,6 +10,13 @@ Fixed:
 
 - Nothing yet
 
+`0-9-1`_ - 2018-10-29
+-------------------
+
+Fixed:
+
+- Fix "make install" step in Makefile used at Diamond Light Source
+
 `0-9`_ - 2018-07-03
 -------------------
 
@@ -95,7 +102,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-9...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-9-1...HEAD
+.. _0-9-1: https://github.com/dls-controls/annotypes/compare/0-9...0-9-1
 .. _0-9: https://github.com/dls-controls/annotypes/compare/0-8...0-9
 .. _0-8: https://github.com/dls-controls/annotypes/compare/0-7...0-8
 .. _0-7: https://github.com/dls-controls/annotypes/compare/0-6...0-7

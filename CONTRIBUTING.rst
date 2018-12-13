@@ -52,6 +52,7 @@ Before a new release, please go through the following checklist:
 
 * Bump version in annotypes/version.py
 * Add a release note in CHANGELOG.rst
+* Create a new github compare link at the bottom of CHANGELOG.rst for the release and update the _Unreleased link with the new release number
 * Git tag the version
 * Push to github and travis will make a release on pypi
 
