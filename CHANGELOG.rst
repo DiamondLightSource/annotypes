@@ -10,6 +10,14 @@ Fixed:
 
 - Nothing yet
 
+`0-10`_ - 2018-12-13
+-------------------
+
+Fixed:
+
+- Fix Array.__ne__ behaviour, and fix Array.__eq__ for numpy arrays
+
+
 `0-9-1`_ - 2018-10-29
 -------------------
 
@@ -102,7 +110,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-9-1...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-10...HEAD
+.. _0-10: https://github.com/dls-controls/annotypes/compare/0-9-1...0-10
 .. _0-9-1: https://github.com/dls-controls/annotypes/compare/0-9...0-9-1
 .. _0-9: https://github.com/dls-controls/annotypes/compare/0-8...0-9
 .. _0-8: https://github.com/dls-controls/annotypes/compare/0-7...0-8
