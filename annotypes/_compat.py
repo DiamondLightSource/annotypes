@@ -1,11 +1,6 @@
 import inspect
 import sys
 
-from ._typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from typing import Callable
-
 
 # Taken from six
 def add_metaclass(metaclass):
