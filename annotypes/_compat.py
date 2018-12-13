@@ -19,7 +19,6 @@ def add_metaclass(metaclass):
 
 
 def getargspec(f):
-    # type: (Callable) -> inspect.ArgSpec
     if sys.version_info < (3,):
         args, varargs, keywords, defaults = inspect.getargspec(f)
     else:
