@@ -2,4 +2,4 @@ mypy; python_version > '3.3'
 coverage>=3.7.1
 pytest>=3.3
 pytest-cov<=2.6.0
-enum34; pythn_version < '3.4'
+enum34; python_version < '3.4'
