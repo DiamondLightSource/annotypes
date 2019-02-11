@@ -11,14 +11,14 @@ You can write things like:
 
     from annotypes import Anno, WithCallTypes
 
-    with Anno("The exposure to be active for"):
-        Exposure = float
+    with Anno("The exposure time for the camera"):
+        AExposure = float
     with Anno("The full path to the text file to write"):
-        Path = str
+        APath = str
 
     class Simple(WithCallTypes):
         def __init__(self, exposure, path="/tmp/file.txt"):
-            # type: (Exposure, Path) -> None
+            # type: (AExposure, APath) -> None
             self.exposure = exposure
             self.path = path
 
@@ -29,13 +29,13 @@ or the Python3 alternative:
 
     from annotypes import Anno, WithCallTypes
 
-    with Anno("The exposure to be active for"):
-        Exposure = float
+    with Anno("The exposure time for the camera"):
+        AExposure = float
     with Anno("The full path to the text file to write"):
-        Path = str
+        APath = str
 
     class Simple(WithCallTypes):
-        def __init__(self, exposure: Exposure, path: Path = "/tmp/file.txt"):
+        def __init__(self, exposure: AExposure, path: APath = "/tmp/file.txt"):
             self.exposure = exposure
             self.path = path
 
@@ -48,7 +48,7 @@ And at runtime see what you should pass to call it and what it will return:
     >>> list(Simple.call_types)
     ['exposure', 'path']
     >>> Simple.call_types['exposure']
-    Anno(name='Exposure', typ=<type 'float'>, description='The exposure to be active for')
+    Anno(name='AExposure', typ=<type 'float'>, description='The exposure to be active for')
     >>> Simple.return_type
     Anno(name='Instance', typ=<class 'annotypes.py2_examples.simple.Simple'>, description='Class instance')
 
