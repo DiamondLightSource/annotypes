@@ -48,7 +48,7 @@ And at runtime see what you should pass to call it and what it will return:
     >>> list(Simple.call_types)
     ['exposure', 'path']
     >>> Simple.call_types['exposure']
-    Anno(name='AExposure', typ=<type 'float'>, description='The exposure to be active for')
+    Anno(name='AExposure', typ=<type 'float'>, description='The exposure time for the camera')
     >>> Simple.return_type
     Anno(name='Instance', typ=<class 'annotypes.py2_examples.simple.Simple'>, description='Class instance')
 
