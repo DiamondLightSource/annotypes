@@ -4,7 +4,7 @@ from ._calltypes import WithCallTypes
 from ._typing import TypeVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Type, Dict, Any, Union, Sequence
+    from typing import Type, Dict, Any, Union, Sequence, List, Tuple
 
 
 def serialize_object(o, dict_cls=OrderedDict):
@@ -31,7 +31,7 @@ T = TypeVar("T")
 
 
 def deserialize_object(ob, type_check=None):
-    # type: (Any, Union[Type[T], Sequence[Type[T]]]) -> T
+    # type: (Any, Union[Type[T], Tuple[Type[T], ...]]) -> T
     if isinstance(ob, dict):
         subclass = Serializable.lookup_subclass(ob)
         ob = subclass.from_dict(ob)
@@ -48,9 +48,9 @@ class Serializable(WithCallTypes):
     typeid = None
 
     # dict mapping typeid name -> cls
-    _subcls_lookup = {}
+    _subcls_lookup = {}  # type: Dict[str, Serializable]
 
-    __slots__ = []
+    __slots__ = []  # type: List[str]
 
     def __getitem__(self, item):
         """Dictionary access to attr data"""
@@ -66,7 +66,7 @@ class Serializable(WithCallTypes):
         return iter(self.call_types)
 
     def to_dict(self, dict_cls=OrderedDict):
-        # type: () -> Dict[str, Any]
+        # type: (Type[dict]) -> Dict[str, Any]
         """Create a dictionary representation of object attributes
 
         Returns:
