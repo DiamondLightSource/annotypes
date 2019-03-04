@@ -6,9 +6,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased`_
 -------------
 
-Fixed:
+Added:
 
-- Nothing yet
+- typeid based Serializable, serialize_object and deserialize_object
 
 `0-10`_ - 2018-12-13
 -------------------
