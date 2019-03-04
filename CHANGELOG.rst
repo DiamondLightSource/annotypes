@@ -6,6 +6,13 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased`_
 -------------
 
+Fixed:
+
+- Nothing yet
+
+`0-11`_ - 2019-03-04
+-------------------
+
 Added:
 
 - typeid based Serializable, serialize_object and deserialize_object
@@ -110,7 +117,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-10...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-11...HEAD
+.. _0-11: https://github.com/dls-controls/annotypes/compare/0-10...0-11
 .. _0-10: https://github.com/dls-controls/annotypes/compare/0-9-1...0-10
 .. _0-9-1: https://github.com/dls-controls/annotypes/compare/0-9...0-9-1
 .. _0-9: https://github.com/dls-controls/annotypes/compare/0-8...0-9
