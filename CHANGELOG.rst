@@ -10,6 +10,13 @@ Fixed:
 
 - Nothing yet
 
+`0-12`_ - 2019-03-12
+-------------------
+
+Fixed:
+
+- Fix serialization of nested objects in Arrays
+
 `0-11`_ - 2019-03-04
 -------------------
 
@@ -117,7 +124,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-11...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-12...HEAD
+.. _0-12: https://github.com/dls-controls/annotypes/compare/0-11...0-12
 .. _0-11: https://github.com/dls-controls/annotypes/compare/0-10...0-11
 .. _0-10: https://github.com/dls-controls/annotypes/compare/0-9-1...0-10
 .. _0-9-1: https://github.com/dls-controls/annotypes/compare/0-9...0-9-1
