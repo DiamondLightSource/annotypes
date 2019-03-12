@@ -13,7 +13,6 @@ with Anno("A Not Camel"):
     ANotCamel = Array[int]
 UNotCamel = Union[ANotCamel, Sequence[int]]
 
-
 @Serializable.register_subclass("foo:1.0")
 class DummySerializable(Serializable):
     boo = None
@@ -40,9 +39,25 @@ class DummySerializable(Serializable):
         self.NOT_CAMEL = ANotCamel(c)
 
 
+with Anno("A DSArray"):
+    ADSArray = Array[DummySerializable]
+UDSArray = Union[ADSArray, Sequence[DummySerializable]]
+
+
 @Serializable.register_subclass("empty:1.0")
 class EmptySerializable(Serializable):
     pass
+
+
+@Serializable.register_subclass("nested:1.0")
+class NestedSerializable(Serializable):
+    boo = None
+    dsarray = None
+
+    def __init__(self, boo, dsarray):
+        # type: (ABoo, UDSArray) -> None
+        self.boo = ABoo(boo)
+        self.dsarray = ADSArray(dsarray)
 
 
 class TestSerialization(unittest.TestCase):
@@ -73,7 +88,7 @@ class TestSerialization(unittest.TestCase):
     def test_serialize(self):
         x = serialize_object(self.s)
         assert x == self.expected
-        x = serialize_object([self.s])
+        x = serialize_object(ADSArray(self.s))
         assert x == [self.expected]
 
     def test_no_args(self):
@@ -111,4 +126,14 @@ class TestSerialization(unittest.TestCase):
         assert expected == s.to_dict()
 
         n = DummySerializable.from_dict(expected)
+        assert n.to_dict() == expected
+
+    def test_to_dict_nested(self):
+
+        n = NestedSerializable(13, self.s)
+
+        expected = OrderedDict(typeid="nested:1.0")
+        expected["boo"] = 13
+        expected["dsarray"] = [self.expected]
+
         assert n.to_dict() == expected
