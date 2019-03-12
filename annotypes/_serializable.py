@@ -13,15 +13,17 @@ def serialize_object(o, dict_cls=OrderedDict):
         return o.to_dict(dict_cls)
     except AttributeError:
         if isinstance(o, dict):
-            # Need to recurse down
+            # Need to recurse down in case we have a serializable object in the
+            # dict or somewhere further down the tree
             d = dict_cls()
             for k, v in o.items():
                 d[k] = serialize_object(v, dict_cls)
             return d
-        elif isinstance(o, list):
-            # Need to recurse down
-            # TODO: Arrays of objects are not caught here
-            return [serialize_object(x, dict_cls) for x in o]
+        # Compare on classname is cheaper than a subclass check...
+        elif o.__class__.__name__ == "Array" and hasattr(o.typ, "to_dict"):
+            # Arrays might be of serializable objects, if so then recurse
+            # down.
+            return [x.to_dict(dict_cls) for x in o]
         else:
             # Hope it's serializable!
             return o
