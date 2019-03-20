@@ -6,9 +6,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased`_
 -------------
 
-Fixed:
+Added:
 
-- Nothing yet
+- Added Sphinx call_types extension to get correct Serializable documentation
 
 `0-12`_ - 2019-03-12
 -------------------
