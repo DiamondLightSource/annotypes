@@ -16,6 +16,7 @@ with Anno("A Not Camel"):
     ANotCamel = Array[int]
 UNotCamel = Union[ANotCamel, Sequence[int]]
 
+
 @Serializable.register_subclass("foo:1.0")
 class DummySerializable(Serializable):
     boo = None
