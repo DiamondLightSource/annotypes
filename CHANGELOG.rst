@@ -6,9 +6,15 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 `Unreleased`_
 -------------
 
+Nothing yet.
+
+`0-13`_ - 2019-03-20
+-------------------
+
 Added:
 
-- Added Sphinx call_types extension to get correct Serializable documentation
+- Sphinx call_types extension to get correct Serializable documentation
+- json_encode and json_decode functions that operate on Serializable
 
 `0-12`_ - 2019-03-12
 -------------------
@@ -124,7 +130,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-12...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-13...HEAD
+.. _0-13: https://github.com/dls-controls/annotypes/compare/0-12...0-13
 .. _0-12: https://github.com/dls-controls/annotypes/compare/0-11...0-12
 .. _0-11: https://github.com/dls-controls/annotypes/compare/0-10...0-11
 .. _0-10: https://github.com/dls-controls/annotypes/compare/0-9-1...0-10
