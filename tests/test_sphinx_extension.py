@@ -31,8 +31,8 @@ with Anno("A Not Camel"):
 UNotCamel = Union[ANotCamel, Sequence[int]]
 
 
-@Serializable.register_subclass("foo:1.0")
-class DummySerializable(Serializable):
+@Serializable.register_subclass("Sphinx:1.0")
+class SphinxSerializable(Serializable):
     boo = None
     bar = None
     foo = None
@@ -83,7 +83,7 @@ class TestSphinxExtension(unittest.TestCase):
 
         d = {'a': 42, 'b': 42}
         foo = [42, 42]
-        s = DummySerializable(3, d, foo)
+        s = SphinxSerializable(3, d, foo)
 
         lines = []
 
@@ -96,7 +96,7 @@ class TestSphinxExtension(unittest.TestCase):
                           ':type foo: int',
                           '',
                           ':returns: Class instance',
-                          ':rtype: DummySerializable']
+                          ':rtype: SphinxSerializable']
 
         process_docstring("app", "what", "name", s, "options", lines)
 
@@ -106,13 +106,13 @@ class TestSphinxExtension(unittest.TestCase):
 
         bar = {'a': 42, 'b': 42}
         foo = [42, 42]
-        s = DummySerializable(3, bar, foo)
+        s = SphinxSerializable(3, bar, foo)
 
         lines = [':type line to stop call types']
 
         expected_lines = [':type line to stop call types',
                           ':returns: Class instance',
-                          ':rtype: DummySerializable']
+                          ':rtype: SphinxSerializable']
 
         process_docstring("app", "what", "name", s, "options", lines)
 
@@ -122,7 +122,7 @@ class TestSphinxExtension(unittest.TestCase):
 
         bar = {'a': 42, 'b': 42}
         foo = [42, 42]
-        s = DummySerializable(3, bar, foo)
+        s = SphinxSerializable(3, bar, foo)
 
         lines = [':rtype line to stop return types']
 
