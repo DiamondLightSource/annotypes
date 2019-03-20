@@ -138,8 +138,6 @@ class TestSphinxExtension(unittest.TestCase):
 
         process_docstring("app", "what", "name", s, "options", lines)
 
-        print lines
-
         assert lines == expected_lines
 
     def test_setup(self):
