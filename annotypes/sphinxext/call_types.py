@@ -25,7 +25,6 @@ def process_docstring(app, what, name, obj, options, lines):
             if typ:
                 lines.append(":type %s: %s" % (k, typ))
             lines.append("")
-        needs_call_types = False
     if needs_return_type and hasattr(obj, "return_type"):
         # If we have a return type and it isn't the object itself
         rt = obj.return_type
@@ -35,7 +34,6 @@ def process_docstring(app, what, name, obj, options, lines):
                 # Don't include the return description if no type given
                 lines.append(":returns: %s" % rt.description)
                 lines.append(":rtype: %s" % typ)
-        needs_return_type = False
 
 
 def setup(app):
