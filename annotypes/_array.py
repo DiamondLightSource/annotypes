@@ -14,14 +14,14 @@ def array_type(cls):
     return type_args[0]
 
 
-def compare_seq(seq, other):
+def seq_neq(seq, other):
     # Do the native compare
     not_equal = seq != other
     if hasattr(not_equal, "any"):
         # numpy overrides == to give an ndarray of the differences. If any
         # elements are different then the Array is different
         not_equal = not_equal.any()
-    return not not_equal
+    return not_equal
 
 
 class Array(Sequence[T], Generic[T]):
@@ -58,13 +58,16 @@ class Array(Sequence[T], Generic[T]):
 
     def __eq__(self, other):
         # type: (object) -> bool
-        if isinstance(other, Array):
-            return self.typ == other.typ and compare_seq(self.seq, other.seq)
-        else:
-            return compare_seq(self.seq, other)
+        return not self != other
 
     def __ne__(self, other):
-        return not self == other
+        # type: (object) -> bool
+        if isinstance(other, Array):
+            if self.typ != other.typ:
+                return True
+            other = other.seq
+        not_equal = seq_neq(self.seq, other)
+        return not_equal
 
     def __repr__(self):
         return "Array(%r)" % (self.seq,)

@@ -1,32 +1,78 @@
-from collections import OrderedDict
+import json
 
+from ._array import Array
 from ._calltypes import WithCallTypes
 from ._typing import TypeVar, TYPE_CHECKING
+from ._frozen_dict import FrozenOrderedDict
+
+try:
+    from enum import Enum
+except ImportError:
+    has_enum = False
+else:
+    has_enum = True
 
 if TYPE_CHECKING:
-    from typing import Type, Dict, Any, Union, Sequence, List, Tuple
+    from typing import Type, Dict, Any, Union, List, Tuple
 
 
-def serialize_object(o, dict_cls=OrderedDict):
+def stringify_error(e):
+    # type: (Exception) -> str
+    return "%s: %s" % (type(e).__name__, str(e))
+
+
+def json_encode(o, indent=None):
+    s = json.dumps(o, default=serialize_object, indent=indent)
+    return s
+
+
+def json_decode(s, dict_cls=FrozenOrderedDict):
     try:
+        o = json.loads(s, object_pairs_hook=dict_cls)
+        assert isinstance(o, dict_cls), "didn't return %s" % dict_cls.__name__
+        return o
+    except Exception as e:
+        raise ValueError("Error decoding JSON object (%s)" % str(e))
+
+
+def serialize_object(o, dict_cls=FrozenOrderedDict):
+    # type: (Any, Type[dict]) -> Any
+    if o.__class__ is Array:
+        # Work out if we need to serialize the objects in the list
+        if hasattr(o.typ, "to_dict") \
+                or issubclass(o.typ, Enum) \
+                or issubclass(o.typ, Exception):
+            list_might_need_serialize = True
+        else:
+            list_might_need_serialize = False
+        # Unwrap the array as it might be a list, tuple or numpy array
+        o = o.seq
+    else:
+        list_might_need_serialize = True
+
+    if hasattr(o, "to_dict"):
         # This will do all the sub layers for us
         return o.to_dict(dict_cls)
-    except AttributeError:
-        if isinstance(o, dict):
-            # Need to recurse down in case we have a serializable object in the
-            # dict or somewhere further down the tree
-            d = dict_cls()
-            for k, v in o.items():
-                d[k] = serialize_object(v, dict_cls)
-            return d
-        # Compare on classname is cheaper than a subclass check...
-        elif o.__class__.__name__ == "Array" and hasattr(o.typ, "to_dict"):
-            # Arrays might be of serializable objects, if so then recurse
-            # down.
-            return [x.to_dict(dict_cls) for x in o]
-        else:
-            # Hope it's serializable!
-            return o
+    elif isinstance(o, dict):
+        # Need to recurse down in case we have a serializable object in the
+        # dict or somewhere further down the tree
+        return dict_cls(tuple((k, serialize_object(v, dict_cls))
+                              for k, v in o.items()))
+    elif isinstance(o, list) and list_might_need_serialize:
+        # Unknown type, recurse down
+        return [serialize_object(x) for x in o]
+    elif hasattr(o, "tolist"):
+        # Numpy bools, numbers and arrays all have a tolist function
+        return o.tolist()
+    elif isinstance(o, Exception):
+        # Exceptions should be stringified
+        return stringify_error(o)
+    elif has_enum and isinstance(o, Enum):
+        # Return value of enums
+        return o.value
+    else:
+        # Everything else should be serializable already
+        return o
 
 
 T = TypeVar("T")
@@ -61,28 +107,27 @@ class Serializable(WithCallTypes):
                 return getattr(self, item)
             except (AttributeError, TypeError):
                 raise KeyError(item)
+        elif item is "typeid" and self.typeid is not None:
+            return self.typeid
         else:
             raise KeyError(item)
 
     def __iter__(self):
         return iter(self.call_types)
 
-    def to_dict(self, dict_cls=OrderedDict):
+    def to_dict(self, dict_cls=FrozenOrderedDict):
         # type: (Type[dict]) -> Dict[str, Any]
         """Create a dictionary representation of object attributes
 
         Returns:
             OrderedDict serialised version of self
         """
-
-        d = dict_cls()
+        pairs = tuple((k, serialize_object(getattr(self, k), dict_cls))
+                      for k in self.call_types)
         if self.typeid:
-            d["typeid"] = self.typeid
-
-        for k in self.call_types:
-            # check_camel_case(k)
-            d[k] = serialize_object(getattr(self, k), dict_cls)
-
+            d = dict_cls((("typeid", self.typeid),) + pairs)
+        else:
+            d = dict_cls(pairs)
         return d
 
     @classmethod

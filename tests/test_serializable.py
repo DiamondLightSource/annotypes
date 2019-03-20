@@ -1,9 +1,12 @@
 from collections import OrderedDict
+import numpy as np
 import unittest
 
-from annotypes import Anno, Array, Mapping, Union, Sequence, Any, \
-    Serializable, deserialize_object, serialize_object
+from enum import Enum
 
+from annotypes import Anno, Array, Mapping, Union, Sequence, Any, \
+    Serializable, deserialize_object, serialize_object, FrozenOrderedDict, \
+    json_encode, json_decode
 
 with Anno("A Boo"):
     ABoo = int
@@ -81,6 +84,7 @@ class TestSerialization(unittest.TestCase):
         assert self.s["boo"] == 3
         with self.assertRaises(KeyError):
             self.s["bad"]
+        assert self.s["typeid"] == "foo:1.0"
 
     def test_iter(self):
         assert list(self.s) == ['boo', 'bar', 'NOT_CAMEL']
@@ -112,6 +116,71 @@ class TestSerialization(unittest.TestCase):
         d = a.to_dict()
         b = deserialize_object(d, EmptySerializable)
         assert a.to_dict() == b.to_dict()
+
+    def test_frozen_dict(self):
+        items = [("typeid", "me"), ("a", 1), ("b", "two")]
+        d = FrozenOrderedDict(items)
+        assert list(d) == list(d.keys()) == ["typeid", "a", "b"]
+        assert d.items() == list(d.iteritems()) == items
+        assert d.values() == list(d.itervalues()) == ["me", 1, "two"]
+        with self.assertRaises(TypeError):
+            d["a"] = 2
+        with self.assertRaises(TypeError):
+            del d["a"]
+        with self.assertRaises(TypeError):
+            d.pop("a")
+        with self.assertRaises(TypeError):
+            d.popitem()
+        with self.assertRaises(TypeError):
+            d.setdefault("a", 33)
+        with self.assertRaises(TypeError):
+            d.update({"a": 33})
+        with self.assertRaises(TypeError):
+            d.clear()
+        with self.assertRaises(TypeError):
+            d.copy()
+        with self.assertRaises(TypeError):
+            d.fromkeys(("a", "b", "c"))
+
+    def test_json_numpy_array(self):
+        s1 = DummySerializable(3, {}, np.array([3, 4]))
+        assert json_encode(s1) == \
+            '{"typeid": "foo:1.0", "boo": 3, "bar": {}, "NOT_CAMEL": [3, 4]}'
+
+    def test_exception_serialize(self):
+        s = json_encode({"message": ValueError("Bad result")})
+        assert s == '{"message": "ValueError: Bad result"}'
+
+    def test_enum_serialize(self):
+        class MyEnum(Enum):
+            ME = "me"
+
+        s = json_encode({"who": MyEnum.ME})
+        assert s == '{"who": "me"}'
+
+    def test_serializable_not_setting_attr(self):
+        class NoAttr(Serializable):
+            def __init__(self, boo):
+                # type: (ABoo) -> None
+                self.bad = boo
+
+        o = NoAttr(3)
+        assert o.bad == 3
+        with self.assertRaises(KeyError):
+            o["bad"]
+        with self.assertRaises(KeyError):
+            o["boo"]
+        o.boo = 3
+        assert o["boo"] == 3
+
+    def test_json_decode(self):
+        d = json_decode('{"a": 1, "b": 2}')
+        assert list(d) == ["a", "b"]
+        assert d.values() == [1, 2]
+
+    def test_json_decode_not_dict(self):
+        with self.assertRaises(ValueError):
+            json_decode('[1, 2]')
 
     def test_to_dict_children(self):
         children = OrderedDict()
