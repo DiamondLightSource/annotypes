@@ -40,7 +40,7 @@ def serialize_object(o, dict_cls=FrozenOrderedDict):
     if o.__class__ is Array:
         # Work out if we need to serialize the objects in the list
         if hasattr(o.typ, "to_dict") \
-                or issubclass(o.typ, Enum) \
+                or (has_enum and issubclass(o.typ, Enum)) \
                 or issubclass(o.typ, Exception):
             list_might_need_serialize = True
         else:
