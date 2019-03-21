@@ -1,3 +1,4 @@
+import inspect
 import json
 
 from ._array import Array
@@ -38,17 +39,14 @@ def json_decode(s, dict_cls=FrozenOrderedDict):
 def serialize_object(o, dict_cls=FrozenOrderedDict):
     # type: (Any, Type[dict]) -> Any
     if o.__class__ is Array:
-        # Work out if we need to serialize the objects in the list
-        if hasattr(o.typ, "to_dict") \
-                or (has_enum and issubclass(o.typ, Enum)) \
-                or issubclass(o.typ, Exception):
-            list_might_need_serialize = True
-        else:
-            list_might_need_serialize = False
+        # If we wrapped list, this will tell it what might be in it
+        list_cls = o.typ
         # Unwrap the array as it might be a list, tuple or numpy array
         o = o.seq
     else:
-        list_might_need_serialize = True
+        # Don't know what would be in a list, so give it something that will
+        # require it to recurse
+        list_cls = Serializable
 
     if hasattr(o, "to_dict"):
         # This will do all the sub layers for us
@@ -58,9 +56,18 @@ def serialize_object(o, dict_cls=FrozenOrderedDict):
         # dict or somewhere further down the tree
         return dict_cls(tuple((k, serialize_object(v, dict_cls))
                               for k, v in o.items()))
-    elif isinstance(o, list) and list_might_need_serialize:
-        # Unknown type, recurse down
-        return [serialize_object(x) for x in o]
+    elif isinstance(o, list):
+        if inspect.isclass(list_cls) and (
+            hasattr(list_cls, "to_dict") or
+            isinstance(list_cls, Exception) or (
+                has_enum and isinstance(list_cls, Enum))):
+            recurse = True
+        else:
+            recurse = False
+        if recurse:
+            return [serialize_object(x) for x in o]
+        else:
+            return o
     elif hasattr(o, "tolist"):
         # Numpy bools, numbers and arrays all have a tolist function
         return o.tolist()
