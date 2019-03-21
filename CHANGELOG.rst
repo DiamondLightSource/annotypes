@@ -8,6 +8,13 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Nothing yet.
 
+`0-14`_ - 2019-03-21
+-------------------
+
+Fixed:
+
+- serialize_object now works on platforms without enum package
+
 `0-13`_ - 2019-03-20
 -------------------
 
@@ -130,7 +137,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-13...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-14...HEAD
+.. _0-14: https://github.com/dls-controls/annotypes/compare/0-13...0-14
 .. _0-13: https://github.com/dls-controls/annotypes/compare/0-12...0-13
 .. _0-12: https://github.com/dls-controls/annotypes/compare/0-11...0-12
 .. _0-11: https://github.com/dls-controls/annotypes/compare/0-10...0-11
