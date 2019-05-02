@@ -8,6 +8,18 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Nothing yet.
 
+`0-16`_ - 2019-05-02
+--------------------
+
+Fixed:
+
+- some slight performance issues
+- to_array now support unicode
+
+Changed:
+
+- Anno() doesn't take typ anymore in the constructor, use set_typ() instead
+
 `0-15`_ - 2019-03-21
 --------------------
 
@@ -144,7 +156,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-15...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-16...HEAD
+.. _0-16: https://github.com/dls-controls/annotypes/compare/0-15...0-16
 .. _0-15: https://github.com/dls-controls/annotypes/compare/0-14...0-15
 .. _0-14: https://github.com/dls-controls/annotypes/compare/0-13...0-14
 .. _0-13: https://github.com/dls-controls/annotypes/compare/0-12...0-13
