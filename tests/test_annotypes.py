@@ -349,6 +349,10 @@ class TestArray(unittest.TestCase):
         with self.assertRaises(AssertionError):
             to_array(Array[float], inst)
 
+    def test_to_array_unicode(self):
+        inst = to_array(Array[str], u"233")
+        assert inst.seq[0] == "233"
+
     def test_anno_array_instantiate(self):
         inst = ATestArray([1, 2, 3])
         assert inst.seq == [1, 2, 3]

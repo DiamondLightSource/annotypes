@@ -27,3 +27,11 @@ def func_globals(f):
         return f.func_globals
     else:
         return f.__globals__
+
+
+if sys.version_info < (3,):
+    # python 2
+    str_ = basestring
+else:
+    # python 3
+    str_ = str

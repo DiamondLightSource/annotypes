@@ -1,4 +1,5 @@
 from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic
+from ._compat import str_
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Union, Type
@@ -85,7 +86,7 @@ def to_array(typ, seq=None):
         return seq
     elif seq is None:
         return typ()
-    elif isinstance(seq, str) or not isinstance(seq, Sequence):
+    elif isinstance(seq, str_) or not isinstance(seq, Sequence):
         # Wrap it in a list as it should be a sequence
         return typ([seq])
     elif len(seq) == 0:
