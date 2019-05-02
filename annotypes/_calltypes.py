@@ -22,7 +22,7 @@ class CallTypesMeta(GenericMeta):
             cls.call_types = OrderedDict(cls.call_types)
         else:
             cls.call_types = OrderedDict()
-        cls.return_type = Anno("Class instance", typ=cls, name="Instance")
+        cls.return_type = Anno("Class instance", name="Instance").set_typ(cls)
         super(CallTypesMeta, cls).__init__(name, bases, dct, **kwargs)
 
 
@@ -73,7 +73,7 @@ def make_call_types(f, globals_d):
 
     return_type = anno_with_default(annotations.get("return", None))
     if return_type is Any:
-        return_type = Anno("Any return value", Any, "return")
+        return_type = Anno("Any return value", name="return").set_typ(Any)
     assert return_type is None or isinstance(return_type, Anno), \
         "Return has type %r which is not an Anno" % (return_type,)
 

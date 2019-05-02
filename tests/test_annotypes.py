@@ -22,7 +22,7 @@ class TestAnnotypes(unittest.TestCase):
         assert repr(MyClass()) == "MyClass()"
 
     def test_anno_inst(self):
-        a = Anno("The arg to take", typ=str, name="MyArg")
+        a = Anno("The arg to take", name="MyArg").set_typ(str)
         assert repr(a) == \
                "Anno(name='MyArg', typ=%r, description='The arg to take')" % str
 
@@ -318,6 +318,10 @@ class TestReuse(unittest.TestCase):
         inst.configure(params)
 
 
+with Anno("An Array"):
+    ATestArray = Array[int]
+
+
 class TestArray(unittest.TestCase):
     def test_sequence(self):
         assert issubclass([].__class__, collections.Sequence)
@@ -344,6 +348,11 @@ class TestArray(unittest.TestCase):
         assert inst is to_array(Array[int], inst)
         with self.assertRaises(AssertionError):
             to_array(Array[float], inst)
+
+    def test_anno_array_instantiate(self):
+        inst = ATestArray([1, 2, 3])
+        assert inst.seq == [1, 2, 3]
+        assert inst.typ is int
 
     def test_array_type(self):
         assert array_type(Array[int]) is int

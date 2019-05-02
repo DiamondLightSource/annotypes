@@ -67,22 +67,22 @@ def make_repr(inst, attrs):
 
 
 class Anno(object):
-    def __init__(self, description, typ=None, name=None, default=NO_DEFAULT):
-        # type: (str, Any, str, Any) -> None
+    def __init__(self, description, name=None, default=NO_DEFAULT):
+        # type: (str, str, Any) -> None
         """Annotate a type with run-time accessible metadata
 
         Args:
             description: A one-line description for the argument
-            typ: The type of the Anno, can also be set via context manager
             name: The name of the Anno, can also be set via context manager
         """
-        self._names_on_enter = None  # type: Optional[Set[str]]
-        self.default = default  # type: Any
-        self.typ = typ  # type: Any
-        self.name = name  # type: Optional[str]
-        self.is_array = None  # type: Optional[bool]
-        self.is_mapping = None  # type: Optional[bool]
         self.description = description  # type: str
+        self.name = name  # type: Optional[str]
+        self.default = default  # type: Any
+        self.typ = None  # type: Any
+        self.is_array = False  # type: Optional[bool]
+        self.is_mapping = False  # type: Optional[bool]
+        self._names_on_enter = None  # type: Optional[Set[str]]
+        self._array_cls = None  # type: Type[Array]
         # TODO: add min, max, maybe widget
 
     def __call__(self, *args, **kwargs):
@@ -109,7 +109,7 @@ class Anno(object):
 
         >>> MyArg = str
         >>> if not TYPE_CHECKING:
-        ...     MyArg = Anno("The arg to take", typ=str, name="MyArg")
+        ...     MyArg = Anno("The arg to take", name="MyArg").set_typ(str)
         """
         self._names_on_enter = set(caller_locals())
 
@@ -119,25 +119,29 @@ class Anno(object):
             "Expected a single type to be defined, got %s" % list(defined)
         self.name = defined.pop()
 
+    def set_typ(self, typ, is_array=False, is_mapping=False):
+        self.typ = typ
+        assert is_array is False or is_mapping is False, \
+            "Can't have both and array and mapping"
+        self.is_array = is_array
+        if is_array:
+            self._array_cls = Array[typ]
+        self.is_mapping = is_mapping
+        return self
+
     def _get_type(self, typ):
         origin = getattr(typ, "__origin__", None)
         if origin == Array:
             # This is an array
-            self.is_array = True
-            self.is_mapping = False
-            self.typ = typ.__args__[0]
+            self.set_typ(typ.__args__[0], is_array=True)
         elif origin == Mapping:
             # This is a dict
-            self.is_array = False
-            self.is_mapping = True
             assert len(typ.__args__) == 2, \
                 "Expected Mapping[ktyp, vtyp], got %r" % typ
-            self.typ = typ.__args__
+            self.set_typ(typ.__args__, is_mapping=True)
         elif origin is None:
             # This is a bare type
-            self.is_array = False
-            self.is_mapping = False
-            self.typ = typ
+            self.set_typ(typ)
         else:
             raise ValueError("Cannot annotate a type with origin %r" % origin)
 
