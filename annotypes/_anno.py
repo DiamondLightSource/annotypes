@@ -5,7 +5,7 @@ from ._typing import TYPE_CHECKING, Mapping, Union
 from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
-    from typing import Dict, Set, Optional, Any, Sequence, Union
+    from typing import Dict, Set, Optional, Any, Sequence, Union, Type
 
 # Signifies that this is a return value and the default value should be inferred
 RETURN_DEFAULT = object()
@@ -82,7 +82,7 @@ class Anno(object):
         self.is_array = False  # type: Optional[bool]
         self.is_mapping = False  # type: Optional[bool]
         self._names_on_enter = None  # type: Optional[Set[str]]
-        self._array_cls = None  # type: Type[Array]
+        self._array_cls = None  # type: Optional[Type[Array]]
         # TODO: add min, max, maybe widget
 
     def __call__(self, *args, **kwargs):

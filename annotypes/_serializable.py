@@ -54,8 +54,8 @@ def serialize_object(o, dict_cls=FrozenOrderedDict):
     elif isinstance(o, dict):
         # Need to recurse down in case we have a serializable object in the
         # dict or somewhere further down the tree
-        return dict_cls(tuple((k, serialize_object(v, dict_cls))
-                              for k, v in o.items()))
+        return dict_cls((k, serialize_object(v, dict_cls))
+                        for k, v in o.items())
     elif isinstance(o, list):
         if inspect.isclass(list_cls) and (
             hasattr(list_cls, "to_dict") or
@@ -129,12 +129,14 @@ class Serializable(WithCallTypes):
         Returns:
             OrderedDict serialised version of self
         """
-        pairs = tuple((k, serialize_object(getattr(self, k), dict_cls))
-                      for k in self.call_types)
         if self.typeid:
-            d = dict_cls((("typeid", self.typeid),) + pairs)
+            keys = ["typeid"] + list(self.call_types)
         else:
-            d = dict_cls(pairs)
+            keys = self.call_types
+
+        pairs = ((k, serialize_object(getattr(self, k), dict_cls))
+                 for k in keys)
+        d = dict_cls(pairs)
         return d
 
     @classmethod
