@@ -38,6 +38,19 @@ def json_decode(s, dict_cls=FrozenOrderedDict):
 
 def serialize_object(o, dict_cls=FrozenOrderedDict):
     # type: (Any, Type[dict]) -> Any
+    # Is it a Serializable?
+    to_dict = getattr(o, "to_dict", None)
+    if to_dict is not None:
+        return to_dict(dict_cls)
+
+    # Is it a dict?
+    if isinstance(o, dict):
+        # Need to recurse down in case we have a serializable object in the
+        # dict or somewhere further down the tree
+        return dict_cls((k, serialize_object(v, dict_cls))
+                        for k, v in o.items())
+
+    # Is it an Array, list or numpy array?
     if o.__class__ is Array:
         # If we wrapped list, this will tell it what might be in it
         list_cls = o.typ
@@ -47,16 +60,7 @@ def serialize_object(o, dict_cls=FrozenOrderedDict):
         # Don't know what would be in a list, so give it something that will
         # require it to recurse
         list_cls = Serializable
-
-    if hasattr(o, "to_dict"):
-        # This will do all the sub layers for us
-        return o.to_dict(dict_cls)
-    elif isinstance(o, dict):
-        # Need to recurse down in case we have a serializable object in the
-        # dict or somewhere further down the tree
-        return dict_cls((k, serialize_object(v, dict_cls))
-                        for k, v in o.items())
-    elif isinstance(o, list):
+    if isinstance(o, list):
         if inspect.isclass(list_cls) and (
             hasattr(list_cls, "to_dict") or
             isinstance(list_cls, Exception) or (

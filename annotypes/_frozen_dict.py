@@ -7,14 +7,13 @@ class FrozenOrderedDict(dict):
     give better performance than the one in collections"""
     def __init__(self, seq=()):
         super(FrozenOrderedDict, self).__init__()
-
-        def _iter():
-            setitem = super(FrozenOrderedDict, self).__setitem__
-            for k, v in seq:
-                setitem(k, v)
-                yield k
-
-        self._keys = list(_iter())
+        keys = []
+        setitem = super(FrozenOrderedDict, self).__setitem__
+        append = keys.append
+        for k, v in seq:
+            setitem(k, v)
+            append(k)
+        self._keys = keys
 
     __setitem__ = not_supported
     __delitem__ = not_supported
