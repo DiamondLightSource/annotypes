@@ -8,6 +8,14 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Nothing yet.
 
+`0-17`_ - 2019-05-03
+--------------------
+
+Fixed:
+
+- more slight performance tweaks
+
+
 `0-16`_ - 2019-05-02
 --------------------
 
@@ -156,7 +164,8 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-16...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-17...HEAD
+.. _0-17: https://github.com/dls-controls/annotypes/compare/0-16...0-17
 .. _0-16: https://github.com/dls-controls/annotypes/compare/0-15...0-16
 .. _0-15: https://github.com/dls-controls/annotypes/compare/0-14...0-15
 .. _0-14: https://github.com/dls-controls/annotypes/compare/0-13...0-14
