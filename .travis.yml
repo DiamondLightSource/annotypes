@@ -5,16 +5,9 @@ python:
   - "3.5"
   - "3.6"
 
-# For Python 2.7, typing is an optional dependency
-matrix:
-  include:
-    - python: '2.7'
-      env: INSTALL_TYPING=true
-
 # Prepare the environment
 install:
   - pip install -r requirements/test.txt
-  - if [ "$INSTALL_TYPING" == true ]; then pip install typing; fi
   - pip install codecov
 
 # Run tests

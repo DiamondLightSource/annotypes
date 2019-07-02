@@ -6,7 +6,7 @@ import numpy as np
 
 from annotypes import WithCallTypes, Array, Sequence, Anno, Union, \
     add_call_types, Any, to_array, array_type, TypeVar, Generic, \
-    make_annotations
+    make_annotations, issubclass
 
 with Anno("Good origin"):
     Good = str
@@ -162,8 +162,11 @@ class TestWithCallTypes(unittest.TestCase):
         assert list(Sub1.call_types) == ["name"]
         assert list(Sub2.call_types) == ["name"]
 
-        # test is_subclass
-        assert
+        # check subclassing, in particular that Any can be passed for
+        #  subclass checking
+        assert issubclass(Sub2, Root)
+        assert issubclass(Sub1, Root)
+        assert not issubclass(Any, Root)
 
     def test_not_stored_repr(self):
         class NotStored(WithCallTypes):
