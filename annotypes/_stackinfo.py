@@ -12,7 +12,6 @@ import os
 
 
 def find_caller_class(filename):
-    print(filename)
     """
     Find the stack frame of the caller
     """

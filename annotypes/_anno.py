@@ -1,7 +1,7 @@
 import copy
 import sys
 
-from ._typing import TYPE_CHECKING, Union, MappingType
+from ._typing import TYPE_CHECKING, Union, MappingOrigin
 from ._array import Array, to_array
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -134,7 +134,7 @@ class Anno(object):
         if origin == Array:
             # This is an array
             self.set_typ(typ.__args__[0], is_array=True)
-        elif origin == MappingType:
+        elif origin == MappingOrigin:
             # This is a dict
             assert len(typ.__args__) == 2, \
                 "Expected Mapping[ktyp, vtyp], got %r" % typ
@@ -152,3 +152,4 @@ class Anno(object):
         self._get_defined_name(locals_d)
         self._get_type(locals_d[self.name])
         locals_d[self.name] = self
+

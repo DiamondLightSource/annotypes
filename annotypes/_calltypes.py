@@ -25,6 +25,12 @@ class CallTypesMeta(GenericMeta):
         cls.return_type = Anno("Class instance", name="Instance").set_typ(cls)
         super(CallTypesMeta, cls).__init__(name, bases, dct, **kwargs)
 
+    def matches_type(self, cls):
+        if not inspect.isclass(cls):
+            return False
+        else:
+            return issubclass(cls, self)
+
 
 @add_metaclass(CallTypesMeta)
 class WithCallTypes(object):
