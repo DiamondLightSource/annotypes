@@ -30,3 +30,6 @@ if sys.version_info >= (3, 7):
             return False
         else:
             return sys_issubclass(c1, c2)
+else:
+    # noinspection PyShadowingBuiltins
+    issubclass = issubclass
