@@ -20,3 +20,13 @@ except ImportError:
         )
     else:
         raise
+
+if sys.version_info >= (3, 7):
+    sys_issubclass = issubclass
+
+    # noinspection PyShadowingBuiltins
+    def issubclass(c1, c2):
+        if c1 is Any:
+            return False
+        else:
+            return sys_issubclass(c1, c2)

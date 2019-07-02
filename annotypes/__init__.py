@@ -6,5 +6,5 @@ from ._serializable import Serializable, serialize_object, deserialize_object, \
     json_encode, json_decode, stringify_error
 from ._typing import (
     TYPE_CHECKING, TypeVar, Sequence, Union, Optional, Generic,
-    overload, Mapping, Any, GenericMeta
+    overload, Mapping, Any, GenericMeta, issubclass
 )
