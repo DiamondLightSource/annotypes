@@ -1,7 +1,15 @@
+try:
+    from array import array as array_cls
+except ImportError:
+    array_cls = None
+
 from ._compat import str_
 from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic, \
     NEW_TYPING
 from ._stackinfo import find_caller_class
+
+
+
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Union, Type
@@ -82,7 +90,7 @@ class Array(Sequence[T], Generic[T]):
 def to_array(typ, seq=None):
     # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
     expected = array_type(typ)
-    if hasattr(seq, "dtype"):
+    if hasattr(seq, "dtype") or (array_cls and isinstance(seq, array_cls)):
         # It's a numpy array
         return typ(seq)
     elif isinstance(seq, Array):
