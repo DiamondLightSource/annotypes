@@ -8,9 +8,6 @@ from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic, \
     NEW_TYPING
 from ._stackinfo import find_caller_class
 
-
-
-
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Union, Type
 
