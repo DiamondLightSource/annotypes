@@ -1,6 +1,8 @@
 try:
+    # On Jython, java arrays passed in are instances of this class
     from array import array as array_cls
 except ImportError:
+    # On CPython, numpy ndarrays have .dtype, so no need for a class check
     array_cls = None
 
 from ._compat import str_
@@ -88,7 +90,7 @@ def to_array(typ, seq=None):
     # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
     expected = array_type(typ)
     if hasattr(seq, "dtype") or (array_cls and isinstance(seq, array_cls)):
-        # It's a numpy array
+        # It's a numpy array or Jython array
         return typ(seq)
     elif isinstance(seq, Array):
         assert expected == seq.typ, \
