@@ -1,3 +1,5 @@
+import array
+
 from ._compat import str_
 from ._typing import TYPE_CHECKING, overload, Sequence, TypeVar, Generic, \
     NEW_TYPING
@@ -44,6 +46,7 @@ class Array(Sequence[T], Generic[T]):
             orig_class = getattr(self, "__orig_class__", None)
         assert orig_class, "You should instantiate Array[<typ>](...)"
         self.typ = array_type(orig_class)
+        # TODO: add type checking for array.array
         if hasattr(seq, "dtype"):
             assert self.typ == seq.dtype, \
                 "Expected numpy array with dtype %s, got %r with dtype %s" % (
@@ -82,8 +85,8 @@ class Array(Sequence[T], Generic[T]):
 def to_array(typ, seq=None):
     # type: (Type[Array[T]], Union[Array[T], Sequence[T], T]) -> Array[T]
     expected = array_type(typ)
-    if hasattr(seq, "dtype"):
-        # It's a numpy array
+    if hasattr(seq, "dtype") or isinstance(seq, array.array):
+        # It's a numpy array or stdlib array
         return typ(seq)
     elif isinstance(seq, Array):
         assert expected == seq.typ, \
