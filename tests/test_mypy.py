@@ -16,7 +16,7 @@ class TestMyPy(unittest.TestCase):
         if sys.version_info < (3, 4):
             return
         stdout, stderr = mypy("tests/mypy_good.py")
-        assert not stdout
+        assert stdout.decode().startswith("Success")
         assert not stderr
 
     def test_mypy_bad(self):
