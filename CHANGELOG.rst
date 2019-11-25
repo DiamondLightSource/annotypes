@@ -8,6 +8,25 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Nothing yet.
 
+
+`0-21`_ - 2019-11-25
+--------------------
+
+Added:
+
+- array.array now has support in to_array(), but no type checking yet
+
+
+`0-20`_ - 2019-07-07
+--------------------
+
+Changed:
+
+- Updated to work with Python3.7
+- Now typing module is a hard dependency as the fake_typing module was too hard
+  to support
+
+
 `0-17`_ - 2019-05-03
 --------------------
 
@@ -164,7 +183,9 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-17...HEAD
+.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-21...HEAD
+.. _0-21: https://github.com/dls-controls/annotypes/compare/0-20...0-21
+.. _0-20: https://github.com/dls-controls/annotypes/compare/0-17...0-20
 .. _0-17: https://github.com/dls-controls/annotypes/compare/0-16...0-17
 .. _0-16: https://github.com/dls-controls/annotypes/compare/0-15...0-16
 .. _0-15: https://github.com/dls-controls/annotypes/compare/0-14...0-15
