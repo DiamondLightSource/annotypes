@@ -8,14 +8,14 @@ involves big changes, please file a ticket before making a pull request! We
 want to make sure you don't spend your time coding something that might not fit
 the scope of the project.
 
-.. _dls_controls repository: https://github.com/dls-controls/annotypes/issues
+.. _dls_controls repository: https://github.com/DiamondLightSource/annotypes/issues
 
 Running the tests
 -----------------
 
 To get the source source code and run the unit tests, run::
 
-    $ git clone git://github.com/dls-controls/annotypes.git
+    $ git clone git://github.com/DiamondLightSource/annotypes.git
     $ cd annotypes
     $ virtualenv --no-site-packages -p /path/to/python2.7 venv
     $ . venv/bin/activate

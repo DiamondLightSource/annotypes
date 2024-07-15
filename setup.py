@@ -29,7 +29,7 @@ setup(
     version=get_version(),
     description='Annotating type hints and comments with extra metatdata',
     long_description=open("README.rst").read(),
-    url='https://github.com/dls-controls/annotypes',
+    url='https://github.com/DiamondLightSource/annotypes',
     author='Tom Cobb',
     author_email='tom.cobb@diamond.ac.uk',
     keywords='',

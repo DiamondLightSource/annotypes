@@ -63,7 +63,7 @@ To install the latest release, type::
 
 To install the latest code directly from source, type::
 
-    pip install git+git://github.com/dls-controls/annotypes.git
+    pip install git+git://github.com/DiamondLightSource/annotypes.git
 
 
 Changelog
@@ -80,12 +80,12 @@ License
 -------
 APACHE License. (see `LICENSE`_)
 
-.. |build_status| image:: https://travis-ci.org/dls-controls/annotypes.svg?branch=master
-    :target: https://travis-ci.org/dls-controls/annotypes
+.. |build_status| image:: https://travis-ci.org/DiamondLightSource/annotypes.svg?branch=master
+    :target: https://travis-ci.org/DiamondLightSource/annotypes
     :alt: Build Status
 
-.. |coverage| image:: https://codecov.io/gh/dls-controls/annotypes/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/dls-controls/annotypes
+.. |coverage| image:: https://codecov.io/gh/DiamondLightSource/annotypes/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/DiamondLightSource/annotypes
     :alt: Test coverage
 
 .. |pypi_version| image:: https://img.shields.io/pypi/v/annotypes.svg
@@ -99,16 +99,16 @@ APACHE License. (see `LICENSE`_)
     https://www.jetbrains.com/help/pycharm/type-hinting-in-pycharm.html
 
 .. _Python 2 examples:
-    https://github.com/dls-controls/annotypes/tree/master/annotypes/py2_examples
+    https://github.com/DiamondLightSource/annotypes/tree/master/annotypes/py2_examples
 
 .. _Python 3 examples:
-    https://github.com/dls-controls/annotypes/tree/master/annotypes/py3_examples
+    https://github.com/DiamondLightSource/annotypes/tree/master/annotypes/py3_examples
 
 .. _CHANGELOG:
-    https://github.com/dls-controls/annotypes/blob/master/CHANGELOG.rst
+    https://github.com/DiamondLightSource/annotypes/blob/master/CHANGELOG.rst
 
 .. _CONTRIBUTING:
-    https://github.com/dls-controls/annotypes/blob/master/CONTRIBUTING.rst
+    https://github.com/DiamondLightSource/annotypes/blob/master/CONTRIBUTING.rst
 
 .. _LICENSE:
-    https://github.com/dls-controls/annotypes/blob/master/LICENSE
+    https://github.com/DiamondLightSource/annotypes/blob/master/LICENSE
