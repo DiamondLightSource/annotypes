@@ -183,24 +183,24 @@ Fixed:
 
 Initial release
 
-.. _Unreleased: https://github.com/dls-controls/annotypes/compare/0-21...HEAD
-.. _0-21: https://github.com/dls-controls/annotypes/compare/0-20...0-21
-.. _0-20: https://github.com/dls-controls/annotypes/compare/0-17...0-20
-.. _0-17: https://github.com/dls-controls/annotypes/compare/0-16...0-17
-.. _0-16: https://github.com/dls-controls/annotypes/compare/0-15...0-16
-.. _0-15: https://github.com/dls-controls/annotypes/compare/0-14...0-15
-.. _0-14: https://github.com/dls-controls/annotypes/compare/0-13...0-14
-.. _0-13: https://github.com/dls-controls/annotypes/compare/0-12...0-13
-.. _0-12: https://github.com/dls-controls/annotypes/compare/0-11...0-12
-.. _0-11: https://github.com/dls-controls/annotypes/compare/0-10...0-11
-.. _0-10: https://github.com/dls-controls/annotypes/compare/0-9-1...0-10
-.. _0-9-1: https://github.com/dls-controls/annotypes/compare/0-9...0-9-1
-.. _0-9: https://github.com/dls-controls/annotypes/compare/0-8...0-9
-.. _0-8: https://github.com/dls-controls/annotypes/compare/0-7...0-8
-.. _0-7: https://github.com/dls-controls/annotypes/compare/0-6...0-7
-.. _0-6: https://github.com/dls-controls/annotypes/compare/0-5...0-6
-.. _0-5: https://github.com/dls-controls/annotypes/compare/0-4...0-5
-.. _0-4: https://github.com/dls-controls/annotypes/compare/0-3...0-4
-.. _0-3: https://github.com/dls-controls/annotypes/compare/0-2...0-3
-.. _0-2: https://github.com/dls-controls/annotypes/compare/0-1-1...0-2
-.. _0-1-1: https://github.com/dls-controls/annotypes/compare/0-1...0-1-1
+.. _Unreleased: https://github.com/DiamondLightSource/annotypes/compare/0-21...HEAD
+.. _0-21: https://github.com/DiamondLightSource/annotypes/compare/0-20...0-21
+.. _0-20: https://github.com/DiamondLightSource/annotypes/compare/0-17...0-20
+.. _0-17: https://github.com/DiamondLightSource/annotypes/compare/0-16...0-17
+.. _0-16: https://github.com/DiamondLightSource/annotypes/compare/0-15...0-16
+.. _0-15: https://github.com/DiamondLightSource/annotypes/compare/0-14...0-15
+.. _0-14: https://github.com/DiamondLightSource/annotypes/compare/0-13...0-14
+.. _0-13: https://github.com/DiamondLightSource/annotypes/compare/0-12...0-13
+.. _0-12: https://github.com/DiamondLightSource/annotypes/compare/0-11...0-12
+.. _0-11: https://github.com/DiamondLightSource/annotypes/compare/0-10...0-11
+.. _0-10: https://github.com/DiamondLightSource/annotypes/compare/0-9-1...0-10
+.. _0-9-1: https://github.com/DiamondLightSource/annotypes/compare/0-9...0-9-1
+.. _0-9: https://github.com/DiamondLightSource/annotypes/compare/0-8...0-9
+.. _0-8: https://github.com/DiamondLightSource/annotypes/compare/0-7...0-8
+.. _0-7: https://github.com/DiamondLightSource/annotypes/compare/0-6...0-7
+.. _0-6: https://github.com/DiamondLightSource/annotypes/compare/0-5...0-6
+.. _0-5: https://github.com/DiamondLightSource/annotypes/compare/0-4...0-5
+.. _0-4: https://github.com/DiamondLightSource/annotypes/compare/0-3...0-4
+.. _0-3: https://github.com/DiamondLightSource/annotypes/compare/0-2...0-3
+.. _0-2: https://github.com/DiamondLightSource/annotypes/compare/0-1-1...0-2
+.. _0-1-1: https://github.com/DiamondLightSource/annotypes/compare/0-1...0-1-1
